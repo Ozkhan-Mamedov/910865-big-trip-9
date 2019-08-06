@@ -1,7 +1,7 @@
 # Личный проект «Большое путешествие» [![Build status][travis-image]][travis-url]
 
 * Студент: [Озхан Мамедов](https://up.htmlacademy.ru/ecmascript/9/user/910865).
-* Наставник: `Неизвестно`.
+* Наставник: [Юрий Татаринцев](https://htmlacademy.ru/profile/id235196).
 
 ---
 
