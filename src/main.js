@@ -1,10 +1,11 @@
-import {getRouteInfoComponent} from './components/route-info.js';
-import {getMenuComponent} from './components/menu.js';
-import {getFiltersComponent} from './components/filters.js';
-import {getSortComponents} from './components/sort.js';
-import {getCardEditComponent} from './components/card-edit.js';
-import {getCardBoardComponent} from './components/card-board.js';
-import {getCardComponent} from './components/card.js';
+import {getRouteInfoComponent} from './components/route-info';
+import {getMenuComponent} from './components/menu';
+import {getFiltersComponent} from './components/filters';
+import {getSortComponents} from './components/sort';
+import {getCardEditComponent} from './components/card-edit';
+import {getCardBoardComponent} from './components/card-board';
+import {getCardComponent} from './components/card';
+import {} from './data';
 
 const tripInfoContainer = document.querySelector(`.trip-info`);
 const controlsContainer = document.querySelector(`.trip-controls`);
@@ -23,7 +24,6 @@ renderComponent(tripInfoContainer, getRouteInfoComponent(), `afterbegin`);
 renderComponent(controlsContainer, getMenuComponent(), `beforeend`);
 renderComponent(controlsContainer, getFiltersComponent(), `beforeend`);
 renderComponent(mainContainer, getSortComponents(), `beforeend`);
-renderComponent(mainContainer, getCardEditComponent(), `beforeend`);
 renderComponent(mainContainer, getCardBoardComponent(), `beforeend`);
 
 const CARD_NUMBER = 3;
@@ -32,3 +32,8 @@ const boardContainer = mainContainer.querySelector(`.trip-days`);
 for (let i = 0; i < CARD_NUMBER; i++) {
   renderComponent(boardContainer, getCardComponent(), `beforeend`);
 }
+
+const cardEditBoardContainer = document.querySelector(`.trip-events__list`);
+
+cardEditBoardContainer.firstElementChild.innerHTML = ``;
+renderComponent(cardEditBoardContainer.firstElementChild, getCardEditComponent(), `afterbegin`);
