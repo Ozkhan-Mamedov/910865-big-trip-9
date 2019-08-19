@@ -12,9 +12,9 @@ export const getCardComponent = ({type, city, waypointPrice, time, description, 
   
         <div class="event__schedule">
           <p class="event__time">
-            <time class="event__start-time" datetime="${new Date(time.startTime).toISOString().substr(0, 16)}">${new Date(time.startTime).toISOString().substr(11, 5)}</time>
+            <time class="event__start-time" datetime="${new Date(time.startTime).toISOString().substr(0, 16)}">${new Date(time.startTime).toTimeString().substr(0, 5)}</time>
             —
-            <time class="event__end-time" datetime="${new Date(time.endTime).toISOString().substr(0, 16)}">${new Date(time.endTime).toISOString().substr(11, 5)}</time>
+            <time class="event__end-time" datetime="${new Date(time.endTime).toISOString().substr(0, 16)}">${new Date(time.endTime).toTimeString().substr(0, 5)}</time>
           </p>
           <p class="event__duration">${time.duration.days !== `00` ? time.duration.days + `D` : ``} ${time.duration.hours !== `00` ? time.duration.hours + `H` : ``} ${time.duration.minutes !== `00` ? time.duration.minutes + `M` : ``}</p>
         </div>

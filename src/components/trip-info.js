@@ -1,7 +1,7 @@
 /**
  * @return {string}
  */
-export const getRouteInfoComponent = () => {
+export const getTripInfoComponent = () => {
   return `
     <div class="trip-info__main">
       <h1 class="trip-info__title">Amsterdam — ... — Amsterdam</h1>

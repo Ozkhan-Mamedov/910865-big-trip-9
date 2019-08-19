@@ -1,9 +1,10 @@
 import {getRandomNumber} from "./utils";
-import {MIN_SENTENCE_NUMBER, MAX_SENTENCE_NUMBER, MAX_PHOTOS_NUMBER,
-  WAYPOINTS_NUMBER, CURRENT_YEAR, MONTHS_IN_YEAR, DAYS_IN_MONTH,
-  HOURS_IN_DAY, MINUTES_IN_HOUR, SECONDS_IN_MINUTE, MSECONDS_IN_SECOND,
-  MAX_TIME_RANGE, MIN_TIME_RANGE} from "./constants";
-import {DAYS_IN_WEEK} from "../../910865-taskmanager-9/src/constants";
+import {
+  MIN_SENTENCE_NUMBER, MAX_SENTENCE_NUMBER, MAX_PHOTOS_NUMBER,
+  WAYPOINTS_NUMBER, HOURS_IN_DAY, MINUTES_IN_HOUR, SECONDS_IN_MINUTE,
+  MSECONDS_IN_SECOND, MAX_TIME_RANGE, MIN_TIME_RANGE, DAYS_IN_WEEK,
+  MIN_PRICE_RANGE, MAX_PRICE_RANGE, MAX_OFFERS_RANGE
+} from "./constants";
 
 const waypointType = {
   'bus': {
@@ -12,7 +13,7 @@ const waypointType = {
   },
   'hotel': {
     address: `check-in.png`,
-    template: `Check into hotel`,
+    template: `Check into hotel in`,
   },
   'car': {
     address: `drive.png`,
@@ -32,7 +33,7 @@ const waypointType = {
   },
   'sight': {
     address: `sightseeing.png`,
-    template: `Sightseeing`,
+    template: `Sightseeing in`,
   },
   'taxi': {
     address: `taxi.png`,
@@ -122,25 +123,40 @@ const months = {
   '11': `dec`,
 };
 
+/**
+ * @return { { address : string,
+ *             template : string } }
+ */
 const getRandomType = () => {
-  return waypointType[waypointTypeNames[getRandomNumber(0, 9)]];
+  return waypointType[waypointTypeNames[getRandomNumber(0, waypointTypeNames.length - 1)]];
 };
 
+/**
+ * @return {number}
+ */
 const getWaypointPrice = () => {
-  return getRandomNumber(15, 500);
+  return getRandomNumber(MIN_PRICE_RANGE, MAX_PRICE_RANGE);
 };
 
+/**
+ * @return {Set<{ title : string,
+ *                price : number,
+ *                isSelected : boolean }>}
+ */
 const getOffers = () => {
   let offers = new Set();
-  let elemIndex = getRandomNumber(0, 2);
+  let elemIndex = getRandomNumber(0, MAX_OFFERS_RANGE);
 
   for (let i = 0; i < elemIndex; i++) {
-    offers.add(additionalOffers[getRandomNumber(0, 4)]);
+    offers.add(additionalOffers[getRandomNumber(0, additionalOffers.length - 1)]);
   }
 
   return offers;
 };
 
+/**
+ * @return { [string] }
+ */
 const getWaypointPhotos = () => {
   let photos = [];
   const photosNumber = getRandomNumber(0, MAX_PHOTOS_NUMBER);
@@ -152,6 +168,10 @@ const getWaypointPhotos = () => {
   return photos;
 };
 
+/**
+ * @param { [string] } descriptions
+ * @return { string }
+ */
 const getWaypointDescription = (descriptions) => {
   let waypointDescription = ``;
   const sentence = getRandomNumber(MIN_SENTENCE_NUMBER, MAX_SENTENCE_NUMBER);
@@ -163,15 +183,20 @@ const getWaypointDescription = (descriptions) => {
   return waypointDescription;
 };
 
+/**
+ * @return { {duration: {hours: string, minutes: string, days: string},
+ *            startTime: number,
+ *            endTime: number} }
+ */
 const getTime = () => {
   const randomDate = Date.now() + getRandomNumber(0, DAYS_IN_WEEK - 1) * HOURS_IN_DAY * MINUTES_IN_HOUR * SECONDS_IN_MINUTE * MSECONDS_IN_SECOND;
   const startTime = randomDate - getRandomNumber(MIN_TIME_RANGE, MAX_TIME_RANGE);
   const endTime = randomDate + getRandomNumber(MIN_TIME_RANGE, MAX_TIME_RANGE);
   const diff = Math.abs(endTime - startTime);
 
-  let minutes = Math.floor((diff / 1000) / 60) % 60;
-  let hours = Math.floor(diff / 3600000) % 24;
-  let days = Math.floor((diff / 3600000) / 24);
+  let minutes = Math.floor((diff / MSECONDS_IN_SECOND) / SECONDS_IN_MINUTE) % SECONDS_IN_MINUTE;
+  let hours = Math.floor(diff / MSECONDS_IN_SECOND / SECONDS_IN_MINUTE / MINUTES_IN_HOUR) % HOURS_IN_DAY;
+  let days = Math.floor((diff / 3600000) / HOURS_IN_DAY);
 
   if (minutes < 10) {
     minutes = `0${minutes}`;
@@ -194,6 +219,26 @@ const getTime = () => {
   };
 };
 
+/**
+ * @return { { offers: Set < {} >,
+ *             city: string,
+ *             description: string,
+ *             time: {
+ *               duration: {
+ *                 days: string,
+ *                 hours: string,
+ *                 minutes: string
+ *               },
+ *               endTime: number,
+ *               startTime: number
+ *             },
+ *             type: {
+ *               address: string,
+ *               template: string
+ *             },
+ *             waypointPrice: number,
+ *             photos: [string] } }
+ */
 const getWaypoint = () => ({
   type: getRandomType(),
   city: cities[getRandomNumber(0, cities.length - 1)],
@@ -205,6 +250,15 @@ const getWaypoint = () => ({
 });
 
 export const waypoints = Array(WAYPOINTS_NUMBER);
+export const menus = [
+  `Table`,
+  `Stats`,
+];
+export const filters = [
+  `everything`,
+  `future`,
+  `past`,
+];
 
 for (let i = 0; i < WAYPOINTS_NUMBER; i++) {
   waypoints[i] = getWaypoint();

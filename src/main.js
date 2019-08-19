@@ -1,4 +1,4 @@
-import {getRouteInfoComponent} from './components/route-info';
+import {getTripInfoComponent} from './components/trip-info';
 import {getMenuComponent} from './components/menu';
 import {getFiltersComponent} from './components/filters';
 import {getSortComponents} from './components/sort';
@@ -6,7 +6,7 @@ import {getCardEditComponent} from './components/card-edit';
 import {getCardBoardComponent} from './components/card-board';
 import {getCardComponent} from './components/card';
 import {getDayComponent} from "./components/day-container";
-import {waypoints} from './data';
+import {waypoints, menus, filters} from './data';
 
 const tripInfoContainer = document.querySelector(`.trip-info`);
 const controlsContainer = document.querySelector(`.trip-controls`);
@@ -22,9 +22,9 @@ const renderComponent = (container, markup, place) => {
   container.insertAdjacentHTML(place, markup);
 };
 
-renderComponent(tripInfoContainer, getRouteInfoComponent(), `afterbegin`);
-renderComponent(controlsContainer, getMenuComponent(), `beforeend`);
-renderComponent(controlsContainer, getFiltersComponent(), `beforeend`);
+renderComponent(tripInfoContainer, getTripInfoComponent(), `afterbegin`);
+renderComponent(controlsContainer, getMenuComponent(menus), `beforeend`);
+renderComponent(controlsContainer, getFiltersComponent(filters), `beforeend`);
 renderComponent(mainContainer, getSortComponents(), `beforeend`);
 renderComponent(mainContainer, getCardBoardComponent(), `beforeend`);
 
