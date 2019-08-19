@@ -123,7 +123,7 @@ const months = {
 };
 
 const getRandomType = () => {
-  return waypointType[waypointTypeNames[getRandomNumber(0, 10)]];
+  return waypointType[waypointTypeNames[getRandomNumber(0, 9)]];
 };
 
 const getWaypointPrice = () => {
@@ -135,7 +135,7 @@ const getOffers = () => {
   let elemIndex = getRandomNumber(0, 2);
 
   for (let i = 0; i < elemIndex; i++) {
-    offers.add(additionalOffers[getRandomNumber(0, 5)]);
+    offers.add(additionalOffers[getRandomNumber(0, 4)]);
   }
 
   return offers;
@@ -169,27 +169,27 @@ const getTime = () => {
   const endTime = randomDate + getRandomNumber(MIN_TIME_RANGE, MAX_TIME_RANGE);
   const diff = Math.abs(endTime - startTime);
 
-  let minutesX = Math.floor((diff / 1000) / 60) % 60;
-  let hoursX = Math.floor(diff / 3600000) % 24;
-  let daysX = Math.floor((diff / 3600000) / 24);
+  let minutes = Math.floor((diff / 1000) / 60) % 60;
+  let hours = Math.floor(diff / 3600000) % 24;
+  let days = Math.floor((diff / 3600000) / 24);
 
-  if (minutesX < 10) {
-    minutesX = `0${minutesX}`;
+  if (minutes < 10) {
+    minutes = `0${minutes}`;
   }
-  if (hoursX < 10) {
-    hoursX = `0${hoursX}`;
+  if (hours < 10) {
+    hours = `0${hours}`;
   }
-  if (daysX < 10) {
-    daysX = `0${daysX}`;
+  if (days < 10) {
+    days = `0${days}`;
   }
 
   return {
     startTime,
     endTime,
     duration: {
-      minutesX,
-      hoursX,
-      daysX
+      minutes,
+      hours,
+      days
     }
   };
 };
