@@ -1,14 +1,107 @@
+import {cities} from "../data";
+
 /**
+ * @params { { offers: Set < {} >,
+  *             city: string,
+  *             description: string,
+  *             time: {
+  *               duration: {
+  *                 days: string,
+  *                 hours: string,
+  *                 minutes: string
+  *               },
+  *               endTime: number,
+  *               startTime: number
+  *             },
+  *             type: {
+  *               address: string,
+  *               template: string
+  *             },
+  *             waypointPrice: number,
+  *             photos: [string] }  }
  * @return {string}
  */
-export const getCardEditComponent = () => {
+export const getCardEditComponent = ({type, city, waypointPrice, time, description, photos, offers}) => {
+  const offersList = Array.from(offers);
+
+  /**
+   * @param { [ { offers: Set < {} >,
+   *             city: string,
+   *             description: string,
+   *             time: {
+   *               duration: {
+   *                 days: string,
+   *                 hours: string,
+   *                 minutes: string
+   *               },
+   *               endTime: number,
+   *               startTime: number
+   *             },
+   *             type: {
+   *               address: string,
+   *               template: string
+   *             },
+   *             waypointPrice: number,
+   *             photos: [string] }] } arr
+   * @param {string} name
+   * @return {boolean}
+   */
+  const getOffersStatus = (arr, name) => {
+    let isSelected = false;
+    let elem;
+
+    switch (name) {
+      case `luggage`:
+        elem = arr.slice().filter((it) => it.id === `luggage`)[0];
+
+        if (elem) {
+          isSelected = elem.isSelected;
+        }
+        break;
+
+      case `comfort`:
+        elem = arr.slice().filter((it) => it.id === `comfort`)[0];
+
+        if (elem) {
+          isSelected = elem.isSelected;
+        }
+        break;
+
+      case `meal`:
+        elem = arr.slice().filter((it) => it.id === `meal`)[0];
+
+        if (elem) {
+          isSelected = elem.isSelected;
+        }
+        break;
+
+      case `seats`:
+        elem = arr.slice().filter((it) => it.id === `seats`)[0];
+
+        if (elem) {
+          isSelected = elem.isSelected;
+        }
+        break;
+
+      case `train`:
+        elem = arr.slice().filter((it) => it.id === `train`)[0];
+
+        if (elem) {
+          isSelected = elem.isSelected;
+        }
+        break;
+    }
+
+    return isSelected;
+  };
+
   return `
     <form class="event  event--edit" action="#" method="post">
       <header class="event__header">
         <div class="event__type-wrapper">
           <label class="event__type  event__type-btn" for="event-type-toggle-1">
             <span class="visually-hidden">Choose event type</span>
-            <img class="event__type-icon" src="img/icons/flight.png" alt="Event type icon" width="17" height="17">
+            <img class="event__type-icon" src="img/icons/${type.address}" alt="Event type icon" width="17" height="17">
           </label>
           <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -75,13 +168,11 @@ export const getCardEditComponent = () => {
 
         <div class="event__field-group  event__field-group--destination">
           <label class="event__label  event__type-output" for="event-destination-1">
-            Sightseeing at
+            ${type.template}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="Saint Petersburg" list="destination-list-1">
+          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${city}" list="destination-list-1">
           <datalist id="destination-list-1">
-            <option value="Amsterdam"></option>
-            <option value="Geneva"></option>
-            <option value="Chamonix"></option>
+          ${cities.map((it, index) => index < cities.length ? `<option value="${it}"></option>` : ``).join(``)}
           </datalist>
         </div>
 
@@ -89,12 +180,12 @@ export const getCardEditComponent = () => {
           <label class="visually-hidden" for="event-start-time-1">
             From
           </label>
-          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="18/03/19 12:25">
+          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${new Date(time.startTime).getDate()}/${(new Date(time.startTime).getMonth() + 1) < 10 ? `0${new Date(time.startTime).getMonth() + 1}` : `${new Date(time.startTime).getMonth() + 1}`}/${new Date(time.startTime).getFullYear().toString().substr(2, 4)} ${new Date(time.startTime).toTimeString().substr(0, 5)}">
           —
           <label class="visually-hidden" for="event-end-time-1">
             To
           </label>
-          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="18/03/19 13:35">
+          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${new Date(time.endTime).getDate()}/${(new Date(time.endTime).getMonth() + 1) < 10 ? `0${new Date(time.endTime).getMonth() + 1}` : `${new Date(time.endTime).getMonth() + 1}`}/${new Date(time.endTime).getFullYear().toString().substr(2, 4)} ${new Date(time.endTime).toTimeString().substr(0, 5)}">
         </div>
 
         <div class="event__field-group  event__field-group--price">
@@ -102,7 +193,7 @@ export const getCardEditComponent = () => {
             <span class="visually-hidden">Price</span>
             €
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="160">
+          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${waypointPrice}">
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -125,10 +216,10 @@ export const getCardEditComponent = () => {
 
         <section class="event__section  event__section--offers">
           <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-
           <div class="event__available-offers">
+          
             <div class="event__offer-selector">
-              <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" checked="">
+              <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" ${getOffersStatus(offersList, `luggage`) ? `checked=""` : ``}>
               <label class="event__offer-label" for="event-offer-luggage-1">
                 <span class="event__offer-title">Add luggage</span>
                 +
@@ -137,7 +228,7 @@ export const getCardEditComponent = () => {
             </div>
 
             <div class="event__offer-selector">
-              <input class="event__offer-checkbox  visually-hidden" id="event-offer-comfort-1" type="checkbox" name="event-offer-comfort" checked="">
+              <input class="event__offer-checkbox  visually-hidden" id="event-offer-comfort-1" type="checkbox" name="event-offer-comfort" ${getOffersStatus(offersList, `comfort`) ? `checked=""` : ``}>
               <label class="event__offer-label" for="event-offer-comfort-1">
                 <span class="event__offer-title">Switch to comfort class</span>
                 +
@@ -146,7 +237,7 @@ export const getCardEditComponent = () => {
             </div>
 
             <div class="event__offer-selector">
-              <input class="event__offer-checkbox  visually-hidden" id="event-offer-meal-1" type="checkbox" name="event-offer-meal">
+              <input class="event__offer-checkbox  visually-hidden" id="event-offer-meal-1" type="checkbox" name="event-offer-meal" ${getOffersStatus(offersList, `meal`) ? `checked=""` : ``}>
               <label class="event__offer-label" for="event-offer-meal-1">
                 <span class="event__offer-title">Add meal</span>
                 +
@@ -155,7 +246,7 @@ export const getCardEditComponent = () => {
             </div>
 
             <div class="event__offer-selector">
-              <input class="event__offer-checkbox  visually-hidden" id="event-offer-seats-1" type="checkbox" name="event-offer-seats">
+              <input class="event__offer-checkbox  visually-hidden" id="event-offer-seats-1" type="checkbox" name="event-offer-seats" ${getOffersStatus(offersList, `seats`) ? `checked=""` : ``}>
               <label class="event__offer-label" for="event-offer-seats-1">
                 <span class="event__offer-title">Choose seats</span>
                 +
@@ -164,7 +255,7 @@ export const getCardEditComponent = () => {
             </div>
 
             <div class="event__offer-selector">
-              <input class="event__offer-checkbox  visually-hidden" id="event-offer-train-1" type="checkbox" name="event-offer-train">
+              <input class="event__offer-checkbox  visually-hidden" id="event-offer-train-1" type="checkbox" name="event-offer-train" ${getOffersStatus(offersList, `train`) ? `checked=""` : ``}>
               <label class="event__offer-label" for="event-offer-train-1">
                 <span class="event__offer-title">Travel by train</span>
                 +
@@ -176,15 +267,11 @@ export const getCardEditComponent = () => {
 
         <section class="event__section  event__section--destination">
           <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-          <p class="event__destination-description">Geneva is a city in Switzerland that lies at the southern tip of expansive Lac Léman (Lake Geneva). Surrounded by the Alps and Jura mountains, the city has views of dramatic Mont Blanc.</p>
+          <p class="event__destination-description">${description}</p>
 
           <div class="event__photos-container">
             <div class="event__photos-tape">
-              <img class="event__photo" src="img/photos/1.jpg" alt="Event photo">
-              <img class="event__photo" src="img/photos/2.jpg" alt="Event photo">
-              <img class="event__photo" src="img/photos/3.jpg" alt="Event photo">
-              <img class="event__photo" src="img/photos/4.jpg" alt="Event photo">
-              <img class="event__photo" src="img/photos/5.jpg" alt="Event photo">
+            ${photos.map((it, index)=> index < photos.length ? `<img class="event__photo" src="${it}" alt="Event photo">` : ``).join(``)}
             </div>
           </div>
         </section>

@@ -13,7 +13,7 @@ const waypointType = {
   },
   'hotel': {
     address: `check-in.png`,
-    template: `Check into hotel in`,
+    template: `Check in`,
   },
   'car': {
     address: `drive.png`,
@@ -33,7 +33,7 @@ const waypointType = {
   },
   'sight': {
     address: `sightseeing.png`,
-    template: `Sightseeing in`,
+    template: `Sightseeing at`,
   },
   'taxi': {
     address: `taxi.png`,
@@ -60,7 +60,7 @@ const waypointTypeNames = [
   `train`,
   `transport`
 ];
-const cities = [
+export const cities = [
   `Venice`,
   `Budapest`,
   `Paris`,
@@ -83,45 +83,36 @@ const description = [
   `In rutrum ac purus sit amet tempus.`];
 const additionalOffers = [
   {
+    id: `luggage`,
     title: `Add luggage`,
     price: 30,
     isSelected: Boolean(Math.round(Math.random())),
   },
   {
+    id: `comfort`,
     title: `Switch to comfort class`,
     price: 100,
     isSelected: Boolean(Math.round(Math.random())),
   },
   {
+    id: `meal`,
     title: `Add meal`,
     price: 15,
     isSelected: Boolean(Math.round(Math.random())),
   },
   {
+    id: `seats`,
     title: `Choose seats`,
     price: 5,
     isSelected: Boolean(Math.round(Math.random())),
   },
   {
+    id: `train`,
     title: `Travel by train`,
     price: 40,
     isSelected: Boolean(Math.round(Math.random())),
   }
 ];
-const months = {
-  '0': `jan`,
-  '1': `feb`,
-  '2': `mar`,
-  '3': `apr`,
-  '4': `may`,
-  '5': `jun`,
-  '6': `jul`,
-  '7': `aug`,
-  '8': `sep`,
-  '9': `oct`,
-  '10': `nov`,
-  '11': `dec`,
-};
 
 /**
  * @return { { address : string,
@@ -148,7 +139,11 @@ const getOffers = () => {
   let elemIndex = getRandomNumber(0, MAX_OFFERS_RANGE);
 
   for (let i = 0; i < elemIndex; i++) {
-    offers.add(additionalOffers[getRandomNumber(0, additionalOffers.length - 1)]);
+    let elem = additionalOffers[getRandomNumber(0, additionalOffers.length - 1)];
+
+    if (elem.isSelected === true) {
+      offers.add(elem);
+    }
   }
 
   return offers;
@@ -184,19 +179,19 @@ const getWaypointDescription = (descriptions) => {
 };
 
 /**
- * @return { {duration: {hours: string, minutes: string, days: string},
+ * @return { {duration: {hours: (string|number), minutes: (string|number), days: (string|number)},
  *            startTime: number,
  *            endTime: number} }
  */
 const getTime = () => {
-  const randomDate = Date.now() + getRandomNumber(0, DAYS_IN_WEEK - 1) * HOURS_IN_DAY * MINUTES_IN_HOUR * SECONDS_IN_MINUTE * MSECONDS_IN_SECOND;
+  const randomDate = Date.now() + getRandomNumber(0, DAYS_IN_WEEK) * HOURS_IN_DAY * MINUTES_IN_HOUR * SECONDS_IN_MINUTE * MSECONDS_IN_SECOND;
   const startTime = randomDate - getRandomNumber(MIN_TIME_RANGE, MAX_TIME_RANGE);
   const endTime = randomDate + getRandomNumber(MIN_TIME_RANGE, MAX_TIME_RANGE);
   const diff = Math.abs(endTime - startTime);
 
   let minutes = Math.floor((diff / MSECONDS_IN_SECOND) / SECONDS_IN_MINUTE) % SECONDS_IN_MINUTE;
   let hours = Math.floor(diff / MSECONDS_IN_SECOND / SECONDS_IN_MINUTE / MINUTES_IN_HOUR) % HOURS_IN_DAY;
-  let days = Math.floor((diff / 3600000) / HOURS_IN_DAY);
+  let days = Math.floor((diff / MSECONDS_IN_SECOND / SECONDS_IN_MINUTE / MINUTES_IN_HOUR) / HOURS_IN_DAY);
 
   if (minutes < 10) {
     minutes = `0${minutes}`;
@@ -249,7 +244,18 @@ const getWaypoint = () => ({
   offers: getOffers(),
 });
 
-export const waypoints = Array(WAYPOINTS_NUMBER);
+/**
+ * @param { { time: { startTime: number,
+ *                    endTime: number } } } a
+ * @param { { time: { startTime: number,
+ *                    endTime: number } } } b
+ * @return {number}
+ */
+const getSortedByDateList = (a, b) => {
+  return a.time.startTime - b.time.startTime;
+};
+
+const waypoints = Array(WAYPOINTS_NUMBER);
 export const menus = [
   `Table`,
   `Stats`,
@@ -264,7 +270,4 @@ for (let i = 0; i < WAYPOINTS_NUMBER; i++) {
   waypoints[i] = getWaypoint();
 }
 
-console.log(getWaypoint());
-console.log(getWaypoint());
-console.log(getWaypoint());
-console.log(waypoints);
+export const sortedWaypoints = waypoints.slice().sort(getSortedByDateList);

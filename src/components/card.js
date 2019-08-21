@@ -1,7 +1,23 @@
 /**
+ * @params { { offers: Set < {} >,
+  *             city: string,
+  *             time: {
+  *               duration: {
+  *                 days: string,
+  *                 hours: string,
+  *                 minutes: string
+  *               },
+  *               endTime: number,
+  *               startTime: number
+  *             },
+  *             type: {
+  *               address: string,
+  *               template: string
+  *             },
+  *             waypointPrice: number } }
  * @return {string}
  */
-export const getCardComponent = ({type, city, waypointPrice, time, description, photos, offers}) => {
+export const getCardComponent = ({type, city, waypointPrice, time, offers}) => {
   return `
     <li class="trip-events__item">
       <div class="event">
