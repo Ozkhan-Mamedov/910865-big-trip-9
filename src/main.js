@@ -1,4 +1,4 @@
-import TripInfo from './components/trip-info';
+import {TripInfo} from './components/trip-info';
 import Menu from './components/menu';
 import Filters from './components/filters';
 import Sort from './components/sort';
@@ -7,21 +7,13 @@ import CardBoard from './components/card-board';
 import Card from './components/card';
 import {Day, tripDaysData} from "./components/day-container";
 import {menus, filters, sortedWaypoints} from './data';
+import {renderComponent} from "./utils";
 
 const tripInfoContainer = document.querySelector(`.trip-info`);
 const controlsContainer = document.querySelector(`.trip-controls`);
 const mainContainer = document.querySelector(`.trip-events`);
 const tripCostValue = document.querySelector(`.trip-info__cost-value`);
 const renderQue = sortedWaypoints.slice();
-
-/**
- * @param {Element} container
- * @param {string} markup
- * @param {InsertPosition} place
- */
-const renderComponent = (container, markup, place) => {
-  container.insertAdjacentHTML(place, markup);
-};
 
 /**
  * @param { [ { offers: Set < {} >,
@@ -55,15 +47,15 @@ const getTripCostValue = (waypointList) => {
 };
 
 tripCostValue.textContent = getTripCostValue(sortedWaypoints);
-renderComponent(tripInfoContainer, getTripInfoComponent(), `afterbegin`);
-renderComponent(controlsContainer, getMenuComponent(menus), `beforeend`);
-renderComponent(controlsContainer, getFiltersComponent(filters), `beforeend`);
-renderComponent(mainContainer, getSortComponents(), `beforeend`);
-renderComponent(mainContainer, getCardBoardComponent(), `beforeend`);
+renderComponent(tripInfoContainer, new TripInfo().getElement(), `afterbegin`);
+renderComponent(controlsContainer, new Menu(menus).getElement(), `beforeend`);
+renderComponent(controlsContainer, new Filters(filters).getElement(), `beforeend`);
+renderComponent(mainContainer, new Sort().getElement(), `beforeend`);
+renderComponent(mainContainer, new CardBoard().getElement(), `beforeend`);
 
 const boardContainer = mainContainer.querySelector(`.trip-days`);
 
-renderComponent(boardContainer, getDayComponent(), `beforeend`);
+renderComponent(boardContainer, new Day().getElement(), `beforeend`);
 
 const eventsContainer = mainContainer.querySelectorAll(`.trip-events__list`);
 let eventContainerIndex = 0;
@@ -75,11 +67,11 @@ for (let i = 0; i < tripDaysData.length; i++) {
     }
   }
 
-  renderComponent(eventsContainer[eventContainerIndex], getCardComponent(renderQue[0]), `beforeend`);
+  renderComponent(eventsContainer[eventContainerIndex], new Card(renderQue[0]).getElement(), `beforeend`);
   renderQue.shift();
 }
 
 const cardEditBoardContainer = document.querySelector(`.trip-events__list`);
 
 cardEditBoardContainer.firstElementChild.innerHTML = ``;
-renderComponent(cardEditBoardContainer.firstElementChild, getCardEditComponent(sortedWaypoints[0]), `afterbegin`);
+renderComponent(cardEditBoardContainer.firstElementChild, new CardEdit(sortedWaypoints[0]).getElement(), `afterbegin`);
