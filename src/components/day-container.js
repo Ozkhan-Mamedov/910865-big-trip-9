@@ -1,10 +1,11 @@
 import {sortedWaypoints} from "../data";
 import {getTargetMonth} from "./trip-info";
+import {createElement} from "../utils";
 
 /**
  * @return {number}
  */
-export const getDayNumber = () => {
+const getDayNumber = () => {
   let counter = 1;
   let tmp = tripDaysData[0].tripDay;
 
@@ -64,22 +65,45 @@ const getUniqueTripDays = () => {
   return Array.from(uniqueTripDays);
 };
 
-/**
- * @return {string}
- */
-export const getDayComponent = () => {
-  return `
-    ${tripDaysData.map((it, index) => ((index < getDayNumber())) ? `
-    <li class="trip-days__item  day">
-      <div class="day__info">
-        <span class="day__counter">${getUniqueTripDays()[index]}</span>
-        <time class="day__date" datetime="${new Date(it.dayCode).toISOString().substr(0, 10)}">${it.month} ${it.day}</time>
-      </div>
-      <ul class="trip-events__list">
-      </ul>
-    </li>
-    ` : ``).join(``)}
-  `;
-};
+class Day {
+  constructor() {
+    this._element = null;
+  }
 
-export const tripDaysData = getDaysData();
+  /**
+   * @return {null | Node}
+   */
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  /**
+   * @return {string}
+   */
+  getTemplate() {
+    return `
+      ${tripDaysData.map((it, index) => ((index < getDayNumber())) ? `
+      <li class="trip-days__item  day">
+        <div class="day__info">
+          <span class="day__counter">${getUniqueTripDays()[index]}</span>
+          <time class="day__date" datetime="${new Date(it.dayCode).toISOString().substr(0, 10)}">${it.month} ${it.day}</time>
+        </div>
+        <ul class="trip-events__list">
+        </ul>
+      </li>
+      ` : ``).join(``)}
+    `;
+  }
+}
+
+const tripDaysData = getDaysData();
+
+export {
+  getDayNumber,
+  Day,
+  tripDaysData
+};

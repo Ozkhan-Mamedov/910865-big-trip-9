@@ -60,7 +60,7 @@ const waypointTypeNames = [
   `train`,
   `transport`
 ];
-export const cities = [
+const cities = [
   `Venice`,
   `Budapest`,
   `Paris`,
@@ -256,11 +256,11 @@ const getSortedByDateList = (a, b) => {
 };
 
 const waypoints = Array(WAYPOINTS_NUMBER);
-export const menus = [
+const menus = [
   `Table`,
   `Stats`,
 ];
-export const filters = [
+const filters = [
   `everything`,
   `future`,
   `past`,
@@ -270,4 +270,11 @@ for (let i = 0; i < WAYPOINTS_NUMBER; i++) {
   waypoints[i] = getWaypoint();
 }
 
-export const sortedWaypoints = waypoints.slice().sort(getSortedByDateList);
+const sortedWaypoints = waypoints.slice().sort(getSortedByDateList);
+
+export {
+  cities,
+  menus,
+  filters,
+  sortedWaypoints
+};

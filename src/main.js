@@ -1,11 +1,11 @@
-import {getTripInfoComponent} from './components/trip-info';
-import {getMenuComponent} from './components/menu';
-import {getFiltersComponent} from './components/filters';
-import {getSortComponents} from './components/sort';
-import {getCardEditComponent} from './components/card-edit';
-import {getCardBoardComponent} from './components/card-board';
-import {getCardComponent} from './components/card';
-import {getDayComponent, tripDaysData} from "./components/day-container";
+import TripInfo from './components/trip-info';
+import Menu from './components/menu';
+import Filters from './components/filters';
+import Sort from './components/sort';
+import CardEdit from './components/card-edit';
+import CardBoard from './components/card-board';
+import Card from './components/card';
+import {Day, tripDaysData} from "./components/day-container";
 import {menus, filters, sortedWaypoints} from './data';
 
 const tripInfoContainer = document.querySelector(`.trip-info`);
