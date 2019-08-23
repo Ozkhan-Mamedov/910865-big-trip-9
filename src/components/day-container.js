@@ -30,25 +30,27 @@ const getDayNumber = () => {
  */
 const getDaysData = () => {
   let dates = [];
-  let currentTripDay = 1;
-  let oldStateDate = new Date(sortedWaypoints[0].time.startTime).getDate();
-  let oldStateMonth = new Date(sortedWaypoints[0].time.startTime).getMonth();
 
-  sortedWaypoints.forEach((it) => {
-    if ((new Date(it.time.startTime).getDate() !== oldStateDate) || (new Date(it.time.startTime).getMonth() !== oldStateMonth)) {
-      currentTripDay++;
-    }
+  if (sortedWaypoints.length) {
+    let currentTripDay = 1;
+    let oldStateDate = new Date(sortedWaypoints[0].time.startTime).getDate();
+    let oldStateMonth = new Date(sortedWaypoints[0].time.startTime).getMonth();
 
-    dates.push({
-      tripDay: currentTripDay,
-      day: new Date(it.time.startTime).getDate(),
-      month: getTargetMonth(new Date(it.time.startTime).getMonth()),
-      dayCode: it.time.startTime
+    sortedWaypoints.forEach((it) => {
+      if ((new Date(it.time.startTime).getDate() !== oldStateDate) || (new Date(it.time.startTime).getMonth() !== oldStateMonth)) {
+        currentTripDay++;
+      }
+
+      dates.push({
+        tripDay: currentTripDay,
+        day: new Date(it.time.startTime).getDate(),
+        month: getTargetMonth(new Date(it.time.startTime).getMonth()),
+        dayCode: it.time.startTime
+      });
+      oldStateDate = new Date(it.time.startTime).getDate();
+      oldStateMonth = new Date(it.time.startTime).getMonth();
     });
-    oldStateDate = new Date(it.time.startTime).getDate();
-    oldStateMonth = new Date(it.time.startTime).getMonth();
-  });
-
+  }
   return dates;
 };
 

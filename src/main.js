@@ -55,10 +55,10 @@ const getTripCostValue = (waypointList) => {
 const generatePageElements = () => {
   const checkTasksState = () => {
     if (boardContainer.firstElementChild.childElementCount === 0) {
-      Array.from(boardContainer.firstElementChild.children).forEach((it) => {
+      Array.from(mainContainer.children).forEach((it) => {
         unrenderComponent(it);
       });
-      renderComponent(boardContainer, new NoPoints().getElement(), `beforeend`);
+      renderComponent(mainContainer, new NoPoints().getElement(), `beforeend`);
     }
   };
 
