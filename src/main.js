@@ -38,16 +38,20 @@ const renderQue = sortedWaypoints.slice();
  */
 const getTripCostValue = (waypointList) => {
   let sum = 0;
+  const additionalOffersPrice = document.querySelectorAll(`.event__offer-price`);
 
   waypointList.forEach((it) => {
     sum += it.waypointPrice;
+  });
+
+  additionalOffersPrice.forEach((it) => {
+    sum += parseInt(it.textContent, 10);
   });
 
   return sum;
 };
 
 const generatePageElements = () => {
-  tripCostValue.textContent = `${getTripCostValue(sortedWaypoints)}`;
   renderComponent(tripInfoContainer, new TripInfo().getElement(), `afterbegin`);
   renderComponent(controlsContainer, new Menu(menus).getElement(), `beforeend`);
   renderComponent(controlsContainer, new Filters(filters).getElement(), `beforeend`);
@@ -93,6 +97,8 @@ const generatePageElements = () => {
     cardComponent.querySelector(`.event__rollup-btn`).addEventListener(`click`, onRollupButtonClick);
     renderQue.shift();
   }
+
+  tripCostValue.textContent = `${getTripCostValue(sortedWaypoints)}`;
 };
 
 generatePageElements();
