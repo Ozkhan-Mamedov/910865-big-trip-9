@@ -46,49 +46,53 @@ const getTripCostValue = (waypointList) => {
   return sum;
 };
 
-tripCostValue.textContent = getTripCostValue(sortedWaypoints);
-renderComponent(tripInfoContainer, new TripInfo().getElement(), `afterbegin`);
-renderComponent(controlsContainer, new Menu(menus).getElement(), `beforeend`);
-renderComponent(controlsContainer, new Filters(filters).getElement(), `beforeend`);
-renderComponent(mainContainer, new Sort().getElement(), `beforeend`);
-renderComponent(mainContainer, new CardBoard().getElement(), `beforeend`);
+const generatePageElements = () => {
+  tripCostValue.textContent = `${getTripCostValue(sortedWaypoints)}`;
+  renderComponent(tripInfoContainer, new TripInfo().getElement(), `afterbegin`);
+  renderComponent(controlsContainer, new Menu(menus).getElement(), `beforeend`);
+  renderComponent(controlsContainer, new Filters(filters).getElement(), `beforeend`);
+  renderComponent(mainContainer, new Sort().getElement(), `beforeend`);
+  renderComponent(mainContainer, new CardBoard().getElement(), `beforeend`);
 
-const boardContainer = mainContainer.querySelector(`.trip-days`);
+  const boardContainer = mainContainer.querySelector(`.trip-days`);
 
-renderComponent(boardContainer, new Day().getElement(), `beforeend`);
+  renderComponent(boardContainer, new Day().getElement(), `beforeend`);
 
-const eventsContainer = mainContainer.querySelectorAll(`.trip-events__list`);
-let eventContainerIndex = 0;
+  const eventsContainer = mainContainer.querySelectorAll(`.trip-events__list`);
+  let eventContainerIndex = 0;
 
-for (let i = 0; i < tripDaysData.length; i++) {
-  if (i > 0) {
-    if (tripDaysData[i].tripDay !== tripDaysData[i - 1].tripDay) {
-      eventContainerIndex++;
+  for (let i = 0; i < tripDaysData.length; i++) {
+    if (i > 0) {
+      if (tripDaysData[i].tripDay !== tripDaysData[i - 1].tripDay) {
+        eventContainerIndex++;
+      }
     }
+
+    const onFormSubmit = (evt) => {
+      evt.preventDefault();
+      onRollbackButtonClick();
+      cardEditComponent.querySelector(`.event--edit`).removeEventListener(`submit`, onFormSubmit);
+    };
+
+    const onRollbackButtonClick = () => {
+      cardEditComponent.parentNode.replaceChild(cardComponent, cardEditComponent);
+      cardEditComponent.removeEventListener(`click`, onRollbackButtonClick);
+    };
+
+    const onRollupButtonClick = () => {
+      cardComponent.parentNode.replaceChild(cardEditComponent, cardComponent);
+      cardEditComponent.querySelector(`.event__rollup-btn`).addEventListener(`click`, onRollbackButtonClick);
+      cardComponent.removeEventListener(`click`, onRollupButtonClick);
+      cardEditComponent.querySelector(`.event--edit`).addEventListener(`submit`, onFormSubmit);
+    };
+
+    let cardComponent = new Card(renderQue[0]).getElement();
+    let cardEditComponent = new CardEdit(renderQue[0]).getElement();
+
+    renderComponent(eventsContainer[eventContainerIndex], cardComponent, `beforeend`);
+    cardComponent.querySelector(`.event__rollup-btn`).addEventListener(`click`, onRollupButtonClick);
+    renderQue.shift();
   }
+};
 
-  const onFormSubmit = (evt) => {
-    evt.preventDefault();
-    onRollbackButtonClick();
-    cardEditComponent.querySelector(`.event--edit`).removeEventListener(`submit`, onFormSubmit);
-  };
-
-  const onRollbackButtonClick = () => {
-    cardEditComponent.parentNode.replaceChild(cardComponent, cardEditComponent);
-    cardEditComponent.removeEventListener(`click`, onRollbackButtonClick);
-  };
-
-  const onRollupButtonClick = () => {
-    cardComponent.parentNode.replaceChild(cardEditComponent, cardComponent);
-    cardEditComponent.querySelector(`.event__rollup-btn`).addEventListener(`click`, onRollbackButtonClick);
-    cardComponent.removeEventListener(`click`, onRollupButtonClick);
-    cardEditComponent.querySelector(`.event--edit`).addEventListener(`submit`, onFormSubmit);
-  };
-
-  let cardComponent = new Card(renderQue[0]).getElement();
-  let cardEditComponent = new CardEdit(renderQue[0]).getElement();
-
-  renderComponent(eventsContainer[eventContainerIndex], cardComponent, `beforeend`);
-  cardComponent.querySelector(`.event__rollup-btn`).addEventListener(`click`, onRollupButtonClick);
-  renderQue.shift();
-}
+generatePageElements();
