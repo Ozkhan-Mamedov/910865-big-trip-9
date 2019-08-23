@@ -1,27 +1,19 @@
-import {getTripInfoComponent} from './components/trip-info';
-import {getMenuComponent} from './components/menu';
-import {getFiltersComponent} from './components/filters';
-import {getSortComponents} from './components/sort';
-import {getCardEditComponent} from './components/card-edit';
-import {getCardBoardComponent} from './components/card-board';
-import {getCardComponent} from './components/card';
-import {getDayComponent, tripDaysData} from "./components/day-container";
+import {TripInfo} from './components/trip-info';
+import Menu from './components/menu';
+import Filters from './components/filters';
+import Sort from './components/sort';
+import CardEdit from './components/card-edit';
+import CardBoard from './components/card-board';
+import Card from './components/card';
+import {Day, tripDaysData} from "./components/day-container";
 import {menus, filters, sortedWaypoints} from './data';
+import {renderComponent} from "./utils";
 
 const tripInfoContainer = document.querySelector(`.trip-info`);
 const controlsContainer = document.querySelector(`.trip-controls`);
 const mainContainer = document.querySelector(`.trip-events`);
 const tripCostValue = document.querySelector(`.trip-info__cost-value`);
 const renderQue = sortedWaypoints.slice();
-
-/**
- * @param {Element} container
- * @param {string} markup
- * @param {InsertPosition} place
- */
-const renderComponent = (container, markup, place) => {
-  container.insertAdjacentHTML(place, markup);
-};
 
 /**
  * @param { [ { offers: Set < {} >,
@@ -46,40 +38,67 @@ const renderComponent = (container, markup, place) => {
  */
 const getTripCostValue = (waypointList) => {
   let sum = 0;
+  const additionalOffersPrice = document.querySelectorAll(`.event__offer-price`);
 
   waypointList.forEach((it) => {
     sum += it.waypointPrice;
   });
 
+  additionalOffersPrice.forEach((it) => {
+    sum += parseInt(it.textContent, 10);
+  });
+
   return sum;
 };
 
-tripCostValue.textContent = getTripCostValue(sortedWaypoints);
-renderComponent(tripInfoContainer, getTripInfoComponent(), `afterbegin`);
-renderComponent(controlsContainer, getMenuComponent(menus), `beforeend`);
-renderComponent(controlsContainer, getFiltersComponent(filters), `beforeend`);
-renderComponent(mainContainer, getSortComponents(), `beforeend`);
-renderComponent(mainContainer, getCardBoardComponent(), `beforeend`);
+const generatePageElements = () => {
+  renderComponent(tripInfoContainer, new TripInfo().getElement(), `afterbegin`);
+  renderComponent(controlsContainer, new Menu(menus).getElement(), `beforeend`);
+  renderComponent(controlsContainer, new Filters(filters).getElement(), `beforeend`);
+  renderComponent(mainContainer, new Sort().getElement(), `beforeend`);
+  renderComponent(mainContainer, new CardBoard().getElement(), `beforeend`);
 
-const boardContainer = mainContainer.querySelector(`.trip-days`);
+  const boardContainer = mainContainer.querySelector(`.trip-days`);
 
-renderComponent(boardContainer, getDayComponent(), `beforeend`);
+  renderComponent(boardContainer, new Day().getElement(), `beforeend`);
 
-const eventsContainer = mainContainer.querySelectorAll(`.trip-events__list`);
-let eventContainerIndex = 0;
+  const eventsContainer = mainContainer.querySelectorAll(`.trip-events__list`);
+  let eventContainerIndex = 0;
 
-for (let i = 0; i < tripDaysData.length; i++) {
-  if (i > 0) {
-    if (tripDaysData[i].tripDay !== tripDaysData[i - 1].tripDay) {
-      eventContainerIndex++;
+  for (let i = 0; i < tripDaysData.length; i++) {
+    if (i > 0) {
+      if (tripDaysData[i].tripDay !== tripDaysData[i - 1].tripDay) {
+        eventContainerIndex++;
+      }
     }
+
+    const onFormSubmit = (evt) => {
+      evt.preventDefault();
+      onRollbackButtonClick();
+      cardEditComponent.querySelector(`.event--edit`).removeEventListener(`submit`, onFormSubmit);
+    };
+
+    const onRollbackButtonClick = () => {
+      cardEditComponent.parentNode.replaceChild(cardComponent, cardEditComponent);
+      cardEditComponent.removeEventListener(`click`, onRollbackButtonClick);
+    };
+
+    const onRollupButtonClick = () => {
+      cardComponent.parentNode.replaceChild(cardEditComponent, cardComponent);
+      cardEditComponent.querySelector(`.event__rollup-btn`).addEventListener(`click`, onRollbackButtonClick);
+      cardComponent.removeEventListener(`click`, onRollupButtonClick);
+      cardEditComponent.querySelector(`.event--edit`).addEventListener(`submit`, onFormSubmit);
+    };
+
+    let cardComponent = new Card(renderQue[0]).getElement();
+    let cardEditComponent = new CardEdit(renderQue[0]).getElement();
+
+    renderComponent(eventsContainer[eventContainerIndex], cardComponent, `beforeend`);
+    cardComponent.querySelector(`.event__rollup-btn`).addEventListener(`click`, onRollupButtonClick);
+    renderQue.shift();
   }
 
-  renderComponent(eventsContainer[eventContainerIndex], getCardComponent(renderQue[0]), `beforeend`);
-  renderQue.shift();
-}
+  tripCostValue.textContent = `${getTripCostValue(sortedWaypoints)}`;
+};
 
-const cardEditBoardContainer = document.querySelector(`.trip-events__list`);
-
-cardEditBoardContainer.firstElementChild.innerHTML = ``;
-renderComponent(cardEditBoardContainer.firstElementChild, getCardEditComponent(sortedWaypoints[0]), `afterbegin`);
+generatePageElements();
