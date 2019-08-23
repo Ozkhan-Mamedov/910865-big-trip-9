@@ -6,8 +6,9 @@ import CardEdit from './components/card-edit';
 import CardBoard from './components/card-board';
 import Card from './components/card';
 import {Day, tripDaysData} from "./components/day-container";
+import NoPoints from "./components/no-points";
 import {menus, filters, sortedWaypoints} from './data';
-import {renderComponent} from "./utils";
+import {renderComponent, unrenderComponent} from "./utils";
 
 const tripInfoContainer = document.querySelector(`.trip-info`);
 const controlsContainer = document.querySelector(`.trip-controls`);
@@ -52,6 +53,15 @@ const getTripCostValue = (waypointList) => {
 };
 
 const generatePageElements = () => {
+  const checkTasksState = () => {
+    if (boardContainer.firstElementChild.childElementCount === 0) {
+      Array.from(boardContainer.firstElementChild.children).forEach((it) => {
+        unrenderComponent(it);
+      });
+      renderComponent(boardContainer, new NoPoints().getElement(), `beforeend`);
+    }
+  };
+
   renderComponent(tripInfoContainer, new TripInfo().getElement(), `afterbegin`);
   renderComponent(controlsContainer, new Menu(menus).getElement(), `beforeend`);
   renderComponent(controlsContainer, new Filters(filters).getElement(), `beforeend`);
@@ -72,6 +82,16 @@ const generatePageElements = () => {
       }
     }
 
+    /**
+     * @param {KeyboardEvent} keyEvt
+     */
+    const onEscKeyDown = (keyEvt) => {
+      if (keyEvt.key === `Escape` || keyEvt.key === `Esc`) {
+        cardEditComponent.parentNode.replaceChild(cardComponent, cardEditComponent);
+        document.removeEventListener(`keydown`, onEscKeyDown);
+      }
+    };
+
     const onFormSubmit = (evt) => {
       evt.preventDefault();
       onRollbackButtonClick();
@@ -88,6 +108,7 @@ const generatePageElements = () => {
       cardEditComponent.querySelector(`.event__rollup-btn`).addEventListener(`click`, onRollbackButtonClick);
       cardComponent.removeEventListener(`click`, onRollupButtonClick);
       cardEditComponent.querySelector(`.event--edit`).addEventListener(`submit`, onFormSubmit);
+      document.addEventListener(`keydown`, onEscKeyDown);
     };
 
     let cardComponent = new Card(renderQue[0]).getElement();
@@ -99,6 +120,7 @@ const generatePageElements = () => {
   }
 
   tripCostValue.textContent = `${getTripCostValue(sortedWaypoints)}`;
+  checkTasksState();
 };
 
 generatePageElements();
