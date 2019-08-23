@@ -67,11 +67,28 @@ for (let i = 0; i < tripDaysData.length; i++) {
     }
   }
 
-  renderComponent(eventsContainer[eventContainerIndex], new Card(renderQue[0]).getElement(), `beforeend`);
+  const onFormSubmit = (evt) => {
+    evt.preventDefault();
+    onRollbackButtonClick();
+    cardEditComponent.querySelector(`.event--edit`).removeEventListener(`submit`, onFormSubmit);
+  };
+
+  const onRollbackButtonClick = () => {
+    cardEditComponent.parentNode.replaceChild(cardComponent, cardEditComponent);
+    cardEditComponent.removeEventListener(`click`, onRollbackButtonClick);
+  };
+
+  const onRollupButtonClick = () => {
+    cardComponent.parentNode.replaceChild(cardEditComponent, cardComponent);
+    cardEditComponent.querySelector(`.event__rollup-btn`).addEventListener(`click`, onRollbackButtonClick);
+    cardComponent.removeEventListener(`click`, onRollupButtonClick);
+    cardEditComponent.querySelector(`.event--edit`).addEventListener(`submit`, onFormSubmit);
+  };
+
+  let cardComponent = new Card(renderQue[0]).getElement();
+  let cardEditComponent = new CardEdit(renderQue[0]).getElement();
+
+  renderComponent(eventsContainer[eventContainerIndex], cardComponent, `beforeend`);
+  cardComponent.querySelector(`.event__rollup-btn`).addEventListener(`click`, onRollupButtonClick);
   renderQue.shift();
 }
-
-const cardEditBoardContainer = document.querySelector(`.trip-events__list`);
-
-cardEditBoardContainer.firstElementChild.innerHTML = ``;
-renderComponent(cardEditBoardContainer.firstElementChild, new CardEdit(sortedWaypoints[0]).getElement(), `afterbegin`);
