@@ -1,6 +1,6 @@
-import {createElement} from "../utils";
+import AbstractComponent from "./abstract-components";
 
-class Card {
+class Card extends AbstractComponent {
   /**
    * @params { { offers: Set < {} >,
    *             city: string,
@@ -20,23 +20,12 @@ class Card {
    *             waypointPrice: number } }
    */
   constructor({type, city, waypointPrice, time, offers}) {
+    super();
     this._type = type;
     this._city = city;
     this._waypointPrice = waypointPrice;
     this._time = time;
     this._offers = offers;
-    this._element = null;
-  }
-
-  /**
-   * @return {null | Node}
-   */
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
   }
 
   /**

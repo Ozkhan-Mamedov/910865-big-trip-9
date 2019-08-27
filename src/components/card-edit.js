@@ -1,5 +1,5 @@
 import {cities} from "../data";
-import {createElement} from "../utils";
+import AbstractComponent from "./abstract-components";
 
 /**
  * @param { [ { offers: Set < {} >,
@@ -72,7 +72,7 @@ const getOffersStatus = (arr, name) => {
   return isSelected;
 };
 
-class CardEdit {
+class CardEdit extends AbstractComponent {
   /**
    * @params { { offers: Set < {} >,
    *             city: string,
@@ -94,6 +94,7 @@ class CardEdit {
    *             photos: [string] }  }
    */
   constructor({type, city, waypointPrice, time, description, photos, offers}) {
+    super();
     this._type = type;
     this._city = city;
     this._waypointPrice = waypointPrice;
@@ -101,18 +102,6 @@ class CardEdit {
     this._description = description;
     this._photos = photos;
     this._offers = Array.from(offers);
-    this._element = null;
-  }
-
-  /**
-   * @return {null | Node}
-   */
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
   }
 
   /**

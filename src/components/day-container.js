@@ -1,6 +1,6 @@
 import {sortedWaypoints} from "../data";
 import {getTargetMonth} from "./trip-info";
-import {createElement} from "../utils";
+import AbstractComponent from "./abstract-components";
 
 /**
  * @return {number}
@@ -67,20 +67,9 @@ const getUniqueTripDays = () => {
   return Array.from(uniqueTripDays);
 };
 
-class Day {
+class Day extends AbstractComponent {
   constructor() {
-    this._element = null;
-  }
-
-  /**
-   * @return {null | Node}
-   */
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+    super();
   }
 
   /**

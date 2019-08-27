@@ -1,24 +1,13 @@
 import {sortedWaypoints} from "../data";
 import {monthsInterpreter} from "../constants";
-import {createElement} from "../utils";
+import AbstractComponent from "./abstract-components";
 
 let routePoints = new Set();
 let routeDates = {};
 
-class TripInfo {
+class TripInfo extends AbstractComponent {
   constructor() {
-    this._element = null;
-  }
-
-  /**
-   * @return {null | Node}
-   */
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+    super();
   }
 
   /**
