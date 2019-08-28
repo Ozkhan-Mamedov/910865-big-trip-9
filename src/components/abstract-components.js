@@ -9,7 +9,7 @@ class AbstractComponent {
   }
 
   /**
-   * @return {null | Node}
+   * @return {null | Element}
    */
   getElement() {
     if (!this._element) {

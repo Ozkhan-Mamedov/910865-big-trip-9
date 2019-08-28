@@ -1,7 +1,6 @@
-import {TripInfo} from './components/trip-info';
+import {getTargetMonth, TripInfo} from './components/trip-info';
 import Menu from './components/menu';
 import Filters from './components/filters';
-import Sort from './components/sort';
 import NoPoints from "./components/no-points";
 import {menus, filters, sortedWaypoints} from './data';
 import {renderComponent, unrenderComponent} from "./utils";
@@ -48,6 +47,40 @@ const getTripCostValue = (waypointList) => {
   return sum;
 };
 
+/**
+ * @return { [ {
+ *   tripDay: number,
+ *   day: number,
+ *   month: string,
+ *   dayCode: number
+ *        } ] }
+ */
+const getDaysData = () => {
+  let dates = [];
+
+  if (sortedWaypoints.length) {
+    let currentTripDay = 1;
+    let oldStateDate = new Date(sortedWaypoints[0].time.startTime).getDate();
+    let oldStateMonth = new Date(sortedWaypoints[0].time.startTime).getMonth();
+
+    sortedWaypoints.forEach((it) => {
+      if ((new Date(it.time.startTime).getDate() !== oldStateDate) || (new Date(it.time.startTime).getMonth() !== oldStateMonth)) {
+        currentTripDay++;
+      }
+
+      dates.push({
+        tripDay: currentTripDay,
+        day: new Date(it.time.startTime).getDate(),
+        month: getTargetMonth(new Date(it.time.startTime).getMonth()),
+        dayCode: it.time.startTime
+      });
+      oldStateDate = new Date(it.time.startTime).getDate();
+      oldStateMonth = new Date(it.time.startTime).getMonth();
+    });
+  }
+  return dates;
+};
+
 const generatePageElements = () => {
   const checkTasksState = () => {
     const boardContainer = mainContainer.querySelector(`.trip-days`);
@@ -63,9 +96,9 @@ const generatePageElements = () => {
   renderComponent(tripInfoContainer, new TripInfo().getElement(), `afterbegin`);
   renderComponent(controlsContainer, new Menu(menus).getElement(), `beforeend`);
   renderComponent(controlsContainer, new Filters(filters).getElement(), `beforeend`);
-  renderComponent(mainContainer, new Sort().getElement(), `beforeend`);
 
-  const tripController = new TripController(mainContainer, sortedWaypoints);
+  const tripDaysData = getDaysData();
+  const tripController = new TripController(mainContainer, sortedWaypoints, tripDaysData);
 
   tripController.init();
   tripCostValue.textContent = `${getTripCostValue(sortedWaypoints)}`;
