@@ -1,15 +1,19 @@
-import {sortedWaypoints} from "../data";
-import {getTargetMonth} from "./trip-info";
-import {createElement} from "../utils";
+import AbstractComponent from "./abstract-components";
 
 /**
+ * @param { [ {
+ *   tripDay: number,
+ *   day: number,
+ *   month: string,
+ *   dayCode: number
+ *        } ] } tripDays
  * @return {number}
  */
-const getDayNumber = () => {
+const getDayNumber = (tripDays) => {
   let counter = 1;
-  let tmp = tripDaysData[0].tripDay;
+  let tmp = tripDays[0].tripDay;
 
-  tripDaysData.forEach((it) => {
+  tripDays.forEach((it) => {
     if (tmp !== it.tripDay) {
       counter++;
     }
@@ -21,66 +25,28 @@ const getDayNumber = () => {
 };
 
 /**
- * @return { [ {
+ * @param { [ {
  *   tripDay: number,
  *   day: number,
  *   month: string,
  *   dayCode: number
- *        } ] }
- */
-const getDaysData = () => {
-  let dates = [];
-
-  if (sortedWaypoints.length) {
-    let currentTripDay = 1;
-    let oldStateDate = new Date(sortedWaypoints[0].time.startTime).getDate();
-    let oldStateMonth = new Date(sortedWaypoints[0].time.startTime).getMonth();
-
-    sortedWaypoints.forEach((it) => {
-      if ((new Date(it.time.startTime).getDate() !== oldStateDate) || (new Date(it.time.startTime).getMonth() !== oldStateMonth)) {
-        currentTripDay++;
-      }
-
-      dates.push({
-        tripDay: currentTripDay,
-        day: new Date(it.time.startTime).getDate(),
-        month: getTargetMonth(new Date(it.time.startTime).getMonth()),
-        dayCode: it.time.startTime
-      });
-      oldStateDate = new Date(it.time.startTime).getDate();
-      oldStateMonth = new Date(it.time.startTime).getMonth();
-    });
-  }
-  return dates;
-};
-
-/**
+ *        } ] } tripDays
  * @return {number[]}
  */
-const getUniqueTripDays = () => {
+const getUniqueTripDays = (tripDays) => {
   let uniqueTripDays = new Set();
 
-  tripDaysData.forEach((it) => {
+  tripDays.forEach((it) => {
     uniqueTripDays.add(it.tripDay);
   });
 
   return Array.from(uniqueTripDays);
 };
 
-class Day {
-  constructor() {
-    this._element = null;
-  }
-
-  /**
-   * @return {null | Node}
-   */
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+class Day extends AbstractComponent {
+  constructor(tripDaysData) {
+    super();
+    this._tripDaysData = tripDaysData;
   }
 
   /**
@@ -88,10 +54,10 @@ class Day {
    */
   getTemplate() {
     return `
-      ${tripDaysData.map((it, index) => ((index < getDayNumber())) ? `
+      ${this._tripDaysData.map((it, index) => ((index < getDayNumber(this._tripDaysData))) ? `
       <li class="trip-days__item  day">
         <div class="day__info">
-          <span class="day__counter">${getUniqueTripDays()[index]}</span>
+          <span class="day__counter">${getUniqueTripDays(this._tripDaysData)[index]}</span>
           <time class="day__date" datetime="${new Date(it.dayCode).toISOString().substr(0, 10)}">${it.month} ${it.day}</time>
         </div>
         <ul class="trip-events__list">
@@ -102,10 +68,4 @@ class Day {
   }
 }
 
-const tripDaysData = getDaysData();
-
-export {
-  getDayNumber,
-  Day,
-  tripDaysData
-};
+export default Day;

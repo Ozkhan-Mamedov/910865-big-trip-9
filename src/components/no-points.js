@@ -1,19 +1,8 @@
-import {createElement} from "../utils";
+import AbstractComponent from "./abstract-components";
 
-class NoPoints {
+class NoPoints extends AbstractComponent {
   constructor() {
-    this._element = null;
-  }
-
-  /**
-   * @return {null | Node}
-   */
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+    super();
   }
 
   /**
