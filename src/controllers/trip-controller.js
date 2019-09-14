@@ -71,7 +71,6 @@ class TripController {
       if ((dayIndex > 0) && (this._tripDaysData[dayIndex].tripDay !== this._tripDaysData[dayIndex - 1].tripDay)) {
         this._eventContainerIndex++;
       }
-
       this._renderTripWaypoint(it, this._eventContainerIndex);
     });
   }
@@ -97,16 +96,20 @@ class TripController {
     if (evt.target.tagName !== `INPUT`) {
       return;
     }
-    this._board.getElement().firstElementChild.innerHTML = ``;
+    unrenderComponent(this._board.getElement());
+    this._board = new CardBoard();
+    renderComponent(this._container, this._board.getElement(), `beforeend`);
     this._dayElement = new Day(this._tripDaysData).getElement();
     this._eventContainerIndex = 0;
-    renderComponent(this._container, this._board.getElement(), `beforeend`);
     renderComponent(this._board.getElement().firstElementChild, this._dayElement, `beforeend`);
 
     switch (evt.target.dataset.sortType) {
       case `event`:
         this._waypoints.forEach((it, index) => {
-          this._renderTripWaypoint(it, index);
+          if ((index > 0) && (this._tripDaysData[index].tripDay !== this._tripDaysData[index - 1].tripDay)) {
+            this._eventContainerIndex++;
+          }
+          this._renderTripWaypoint(it, this._eventContainerIndex);
         });
         break;
 
@@ -114,14 +117,20 @@ class TripController {
         this._waypoints.slice()
           .sort((a, b) => (parseInt(a.time.duration.days, 10) - parseInt(b.time.duration.days, 10)) || (parseInt(a.time.duration.hours, 10) - parseInt(b.time.duration.hours, 10)) || (parseInt(a.time.duration.minutes, 10) - parseInt(b.time.duration.minutes, 10)))
           .forEach((it, index) => {
-            this._renderTripWaypoint(it, index);
+            if ((index > 0) && (this._tripDaysData[index].tripDay !== this._tripDaysData[index - 1].tripDay)) {
+              this._eventContainerIndex++;
+            }
+            this._renderTripWaypoint(it, this._eventContainerIndex);
           });
         clearDaysData();
         break;
 
       case `price`:
         this._waypoints.slice().sort((a, b) => a.waypointPrice - b.waypointPrice).forEach((it, index) => {
-          this._renderTripWaypoint(it, index);
+          if ((index > 0) && (this._tripDaysData[index].tripDay !== this._tripDaysData[index - 1].tripDay)) {
+            this._eventContainerIndex++;
+          }
+          this._renderTripWaypoint(it, this._eventContainerIndex);
         });
         clearDaysData();
         break;
