@@ -1,4 +1,5 @@
 import AbstractComponent from "./abstract-components";
+import moment from 'moment';
 
 /**
  * @param { [ {
@@ -58,7 +59,7 @@ class Day extends AbstractComponent {
       <li class="trip-days__item  day">
         <div class="day__info">
           <span class="day__counter">${getUniqueTripDays(this._tripDaysData)[index]}</span>
-          <time class="day__date" datetime="${new Date(it.dayCode).toISOString().substr(0, 10)}">${it.month} ${it.day}</time>
+          <time class="day__date" datetime="${moment(it.dayCode).format(`YYYY-MM-DD`)}">${it.month} ${it.day}</time>
         </div>
         <ul class="trip-events__list">
         </ul>

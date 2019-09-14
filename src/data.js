@@ -3,51 +3,9 @@ import {
   MIN_SENTENCE_NUMBER, MAX_SENTENCE_NUMBER, MAX_PHOTOS_NUMBER,
   WAYPOINTS_NUMBER, HOURS_IN_DAY, MINUTES_IN_HOUR, SECONDS_IN_MINUTE,
   MSECONDS_IN_SECOND, MAX_TIME_RANGE, MIN_TIME_RANGE, DAYS_IN_WEEK,
-  MIN_PRICE_RANGE, MAX_PRICE_RANGE, MAX_OFFERS_RANGE
+  MIN_PRICE_RANGE, MAX_PRICE_RANGE, MAX_OFFERS_RANGE, waypointType, additionalOffers
 } from "./constants";
 
-const waypointType = {
-  'bus': {
-    address: `bus.png`,
-    template: `Bus to`,
-  },
-  'hotel': {
-    address: `check-in.png`,
-    template: `Check in`,
-  },
-  'car': {
-    address: `drive.png`,
-    template: `Drive to`,
-  },
-  'plane': {
-    address: `flight.png`,
-    template: `Flight to`,
-  },
-  'restaurant': {
-    address: `restaurant.png`,
-    template: `Eat at`,
-  },
-  'ship': {
-    address: `ship.png`,
-    template: `Ship to`,
-  },
-  'sight': {
-    address: `sightseeing.png`,
-    template: `Sightseeing at`,
-  },
-  'taxi': {
-    address: `taxi.png`,
-    template: `Taxi to`,
-  },
-  'train': {
-    address: `train.png`,
-    template: `Train to`,
-  },
-  'transport': {
-    address: `transport.png`,
-    template: `Transport to`,
-  },
-};
 const waypointTypeNames = [
   `bus`,
   `hotel`,
@@ -81,38 +39,6 @@ const description = [
   `Aliquam erat volutpat.`,
   `Nunc fermentum tortor ac porta dapibus.`,
   `In rutrum ac purus sit amet tempus.`];
-const additionalOffers = [
-  {
-    id: `luggage`,
-    title: `Add luggage`,
-    price: 30,
-    isSelected: Boolean(Math.round(Math.random())),
-  },
-  {
-    id: `comfort`,
-    title: `Switch to comfort class`,
-    price: 100,
-    isSelected: Boolean(Math.round(Math.random())),
-  },
-  {
-    id: `meal`,
-    title: `Add meal`,
-    price: 15,
-    isSelected: Boolean(Math.round(Math.random())),
-  },
-  {
-    id: `seats`,
-    title: `Choose seats`,
-    price: 5,
-    isSelected: Boolean(Math.round(Math.random())),
-  },
-  {
-    id: `train`,
-    title: `Travel by train`,
-    price: 40,
-    isSelected: Boolean(Math.round(Math.random())),
-  }
-];
 
 /**
  * @return { { address : string,
@@ -179,8 +105,7 @@ const getWaypointDescription = (descriptions) => {
 };
 
 /**
- * @return { {duration: {hours: (string|number), minutes: (string|number), days: (string|number)},
- *            startTime: number,
+ * @return { {startTime: number,
  *            endTime: number} }
  */
 const getTime = () => {

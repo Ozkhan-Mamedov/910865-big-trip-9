@@ -9,8 +9,8 @@ const HOURS_IN_DAY = 24;
 const MINUTES_IN_HOUR = 60;
 const SECONDS_IN_MINUTE = 60;
 const MSECONDS_IN_SECOND = 1000;
-const MIN_TIME_RANGE = -1000000000;
-const MAX_TIME_RANGE = 1000000000;
+const MIN_TIME_RANGE = 0;
+const MAX_TIME_RANGE = 100000000;
 const MIN_PRICE_RANGE = 15;
 const MAX_PRICE_RANGE = 500;
 const MAX_OFFERS_RANGE = 2;
@@ -28,7 +28,80 @@ const monthsInterpreter = {
   '10': `nov`,
   '11': `dec`,
 };
-
+const waypointType = {
+  'bus': {
+    address: `bus.png`,
+    template: `Bus to`,
+  },
+  'hotel': {
+    address: `check-in.png`,
+    template: `Check in`,
+  },
+  'car': {
+    address: `drive.png`,
+    template: `Drive to`,
+  },
+  'plane': {
+    address: `flight.png`,
+    template: `Flight to`,
+  },
+  'restaurant': {
+    address: `restaurant.png`,
+    template: `Eat at`,
+  },
+  'ship': {
+    address: `ship.png`,
+    template: `Ship to`,
+  },
+  'sight': {
+    address: `sightseeing.png`,
+    template: `Sightseeing at`,
+  },
+  'taxi': {
+    address: `taxi.png`,
+    template: `Taxi to`,
+  },
+  'train': {
+    address: `train.png`,
+    template: `Train to`,
+  },
+  'transport': {
+    address: `transport.png`,
+    template: `Transport to`,
+  },
+};
+const additionalOffers = [
+  {
+    id: `luggage`,
+    title: `Add luggage`,
+    price: 30,
+    isSelected: Boolean(Math.round(Math.random())),
+  },
+  {
+    id: `comfort`,
+    title: `Switch to comfort class`,
+    price: 100,
+    isSelected: Boolean(Math.round(Math.random())),
+  },
+  {
+    id: `meal`,
+    title: `Add meal`,
+    price: 15,
+    isSelected: Boolean(Math.round(Math.random())),
+  },
+  {
+    id: `seats`,
+    title: `Choose seats`,
+    price: 5,
+    isSelected: Boolean(Math.round(Math.random())),
+  },
+  {
+    id: `train`,
+    title: `Travel by train`,
+    price: 40,
+    isSelected: Boolean(Math.round(Math.random())),
+  }
+];
 export {
   MIN_SENTENCE_NUMBER,
   MAX_SENTENCE_NUMBER,
@@ -46,5 +119,7 @@ export {
   MIN_PRICE_RANGE,
   MAX_PRICE_RANGE,
   MAX_OFFERS_RANGE,
-  monthsInterpreter
+  monthsInterpreter,
+  waypointType,
+  additionalOffers
 };
