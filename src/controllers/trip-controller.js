@@ -25,7 +25,9 @@ class TripController {
     this._board = new CardBoard();
     this._sort = new Sort();
     this._dayElement = new Day(tripDaysData).getElement();
+    this._subscriptions = [];
     this._onDataChange = this._onDataChange.bind(this);
+    this._onChangeView = this._onChangeView.bind(this);
   }
 
   init() {
@@ -52,7 +54,9 @@ class TripController {
    * @private
    */
   _renderTripWaypoint(tripWaypoint, containerIndex) {
-    const pointController = new PointController(this._dayElement.querySelectorAll(`.trip-events__list`)[containerIndex], tripWaypoint, this._onDataChange);
+    const pointController = new PointController(this._dayElement.querySelectorAll(`.trip-events__list`)[containerIndex], tripWaypoint, this._onDataChange, this._onChangeView);
+
+    this._subscriptions.push(pointController.setDefaultView.bind(pointController));
   }
 
   _onDataChange(newData, oldData) {
@@ -70,6 +74,10 @@ class TripController {
 
       this._renderTripWaypoint(it, this._eventContainerIndex);
     });
+  }
+
+  _onChangeView() {
+    this._subscriptions.forEach((subscription) => subscription());
   }
 
   /**
