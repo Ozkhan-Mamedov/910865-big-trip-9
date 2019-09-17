@@ -7,9 +7,9 @@ class Card extends AbstractComponent {
    *             city: string,
    *             time: {
    *               duration: {
-   *                 days: string,
-   *                 hours: string,
-   *                 minutes: string
+   *                 days: number,
+   *                 hours: number,
+   *                 minutes: number
    *               },
    *               endTime: number,
    *               startTime: number
@@ -33,8 +33,13 @@ class Card extends AbstractComponent {
    * @return {string}
    */
   getTemplate() {
+    /**
+     * @param {number} startTime
+     * @param {number} endTime
+     * @return {{hours: number, minutes: number, days: number}}
+     */
     const getDuration = (startTime, endTime) => {
-      const durationObj = moment.duration(new moment(new Date(endTime)).diff(new moment(new Date(startTime))));
+      const durationObj = moment.duration(moment(new Date(endTime)).diff(moment(new Date(startTime))));
 
       return {
         days: durationObj._data.days,
@@ -54,9 +59,9 @@ class Card extends AbstractComponent {
     
           <div class="event__schedule">
             <p class="event__time">
-              <time class="event__start-time" datetime="${moment(this._time.startTime).format(`YYYY-MM-DDThh:mm`)}">${moment(this._time.startTime).format(`hh:mm`)}</time>
+              <time class="event__start-time" datetime="${moment(this._time.startTime).format(`YYYY-MM-DDThh:mm`)}">${moment(this._time.startTime).format(`HH:mm`)}</time>
               —
-              <time class="event__end-time" datetime="${moment(this._time.endTime).format(`YYYY-MM-DDThh:mm`)}">${moment(this._time.endTime).format(`hh:mm`)}</time>
+              <time class="event__end-time" datetime="${moment(this._time.endTime).format(`YYYY-MM-DDThh:mm`)}">${moment(this._time.endTime).format(`HH:mm`)}</time>
             </p>
             <p class="event__duration">${duration.days !== 0 ? duration.days + `D` : ``} ${duration.hours !== 0 ? duration.hours + `H` : ``} ${duration.minutes !== 0 ? duration.minutes + `M` : ``}</p>
           </div>

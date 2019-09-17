@@ -28,6 +28,27 @@ const monthsInterpreter = {
   '10': `nov`,
   '11': `dec`,
 };
+const cities = [
+  `Venice`,
+  `Budapest`,
+  `Paris`,
+  `Brugge`,
+  `Amsterdam`,
+  `Athens`,
+  `Sydney`
+];
+const waypointTypeNames = [
+  `bus`,
+  `hotel`,
+  `car`,
+  `plane`,
+  `restaurant`,
+  `ship`,
+  `sight`,
+  `taxi`,
+  `train`,
+  `transport`
+];
 const waypointType = {
   'bus': {
     address: `bus.png`,
@@ -102,6 +123,10 @@ const additionalOffers = [
     isSelected: Boolean(Math.round(Math.random())),
   }
 ];
+const TripControllerMode = {
+  ADDING: `adding`,
+  DEFAULT: `default`
+};
 export {
   MIN_SENTENCE_NUMBER,
   MAX_SENTENCE_NUMBER,
@@ -121,5 +146,8 @@ export {
   MAX_OFFERS_RANGE,
   monthsInterpreter,
   waypointType,
-  additionalOffers
+  waypointTypeNames,
+  additionalOffers,
+  cities,
+  TripControllerMode
 };

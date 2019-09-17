@@ -1,7 +1,7 @@
 import Card from "../components/card";
 import CardEdit from "../components/card-edit";
-import {renderComponent} from "../utils";
-import {waypointType, additionalOffers} from "../constants";
+import {renderComponent, Position} from "../utils";
+import {waypointType, additionalOffers, TripControllerMode} from "../constants";
 import moment from 'moment';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
@@ -9,7 +9,34 @@ import 'flatpickr/dist/themes/light.css';
 
 
 class PointController {
-  constructor(container, data, onDataChange, onChangeView) {
+  /**
+   * @param {Element} container
+   * @param { { offers: Set < {} >,
+   *             city: string,
+   *             description: string,
+   *             time: {
+   *               duration: {
+   *                 days: number,
+   *                 hours: number,
+   *                 minutes: number
+   *               },
+   *               endTime: number,
+   *               startTime: number
+   *             },
+   *             type: {
+   *               address: string,
+   *               template: string
+   *             },
+   *             waypointPrice: number,
+   *             photos: [string] } } data
+   * @param { {
+   *    ADDING: string,
+   *    DEFAULT: string
+   *    } } mode
+   * @param {function} onDataChange
+   * @param {function} onChangeView
+   */
+  constructor(container, data, mode, onDataChange, onChangeView) {
     this._container = container;
     this._data = data;
     this._onDataChange = onDataChange;
@@ -17,7 +44,7 @@ class PointController {
     this._cardComponent = new Card(data).getElement();
     this._cardEditComponent = new CardEdit(data).getElement();
 
-    this.init();
+    this.init(mode);
   }
 
   setDefaultView() {
@@ -26,16 +53,37 @@ class PointController {
     }
   }
 
-  init() {
+  /**
+   * @param { {
+   *    ADDING: string,
+   *    DEFAULT: string
+   *    } } mode
+   */
+  init(mode) {
+    let currentView = this._cardComponent;
+    let renderPosition = Position.BEFOREEND;
+    let container = this._container;
+
+    if (mode === TripControllerMode.ADDING) {
+      renderPosition = Position.AFTERBEGIN;
+      currentView = this._cardEditComponent;
+    }
     this._cardEditComponent.querySelector(`.event__type-toggle`).addEventListener(`click`, () => {
       this._cardEditComponent.querySelector(`.event__type-list`).addEventListener(`click`, handler);
     });
 
+    /**
+     * @param {MouseEvent} clickEvt
+     */
     const handler = (clickEvt) => {
       if (clickEvt.target.tagName === `INPUT`) {
         this._cardEditComponent.querySelector(`.event__type-toggle`).checked = ``;
         this._cardEditComponent.querySelector(`.event__type-list`).removeEventListener(`click`, handler);
       }
+    };
+
+    const onDeleteButtonClick = () => {
+      this._onDataChange(null, this._data);
     };
 
     flatpickr(this._cardEditComponent
@@ -52,6 +100,9 @@ class PointController {
      */
     const onEscKeyDown = (keyEvt) => {
       if (keyEvt.key === `Escape` || keyEvt.key === `Esc`) {
+        // Интересный факт. Eсли убрать комментарий, то ошибка срабатывает 1 раз
+        // после чего обработчик удаляется
+        // document.removeEventListener(`keydown`, onEscKeyDown);
         this._cardEditComponent.parentNode.replaceChild(this._cardComponent, this._cardEditComponent);
         document.removeEventListener(`keydown`, onEscKeyDown);
       }
@@ -61,6 +112,10 @@ class PointController {
      * @param {Event} evt
      */
     const onFormSubmit = (evt) => {
+      /**
+       * @param {[string]} data
+       * @return {Set<{}>}
+       */
       const getOfferData = (data) => {
         let offerData = new Set();
 
@@ -87,9 +142,15 @@ class PointController {
         photos: Array.from(this._cardEditComponent.querySelectorAll(`.event__photo`)).map((it) => it.src),
         time: {
           duration: {
-            days: new Date(new Date(formData.get(`event-end-time`)) - new Date(formData.get(`event-start-time`))).getDate(),
-            hours: new Date(new Date(formData.get(`event-end-time`)) - new Date(formData.get(`event-start-time`))).getHours(),
-            minutes: new Date(new Date(formData.get(`event-end-time`)) - new Date(formData.get(`event-start-time`))).getMinutes()
+            get days() {
+              return moment.duration(entry.time.endTime - entry.time.startTime, `milliseconds`).days();
+            },
+            get minutes() {
+              return moment.duration(entry.time.endTime - entry.time.startTime, `milliseconds`).minutes();
+            },
+            get hours() {
+              return moment.duration(entry.time.endTime - entry.time.startTime, `milliseconds`).hours();
+            }
           },
           endTime: moment(formData.get(`event-end-time`), `DD/MM/YYYY hh:mm`).valueOf(),
           startTime: moment(formData.get(`event-start-time`), `DD/MM/YYYY hh:mm`).valueOf()
@@ -107,11 +168,13 @@ class PointController {
     const onRollbackButtonClick = () => {
       this._cardEditComponent.parentNode.replaceChild(this._cardComponent, this._cardEditComponent);
       this._cardEditComponent.removeEventListener(`click`, onRollbackButtonClick);
+      this._cardEditComponent.querySelector(`.event__reset-btn`).removeEventListener(`click`, onDeleteButtonClick);
     };
 
     const onRollupButtonClick = () => {
       this._onChangeView();
       this._cardComponent.parentNode.replaceChild(this._cardEditComponent, this._cardComponent);
+      this._cardEditComponent.querySelector(`.event__reset-btn`).addEventListener(`click`, onDeleteButtonClick);
       this._cardEditComponent.querySelector(`.event__rollup-btn`).addEventListener(`click`, onRollbackButtonClick);
       this._cardComponent.removeEventListener(`click`, onRollupButtonClick);
       this._cardEditComponent.querySelector(`.event__type-list`).addEventListener(`click`, (evt) => {
@@ -173,7 +236,7 @@ class PointController {
       document.addEventListener(`keydown`, onEscKeyDown);
     };
 
-    renderComponent(this._container, this._cardComponent, `beforeend`);
+    renderComponent(container, currentView, renderPosition);
     this._cardComponent.querySelector(`.event__rollup-btn`).addEventListener(`click`, onRollupButtonClick);
   }
 }

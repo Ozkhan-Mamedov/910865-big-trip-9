@@ -51,6 +51,7 @@ const unrenderComponent = (element) => {
 };
 
 export {
+  Position,
   getRandomNumber,
   createElement,
   renderComponent,
