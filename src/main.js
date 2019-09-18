@@ -3,8 +3,9 @@ import Menu from './components/menu';
 import Filters from './components/filters';
 import NoPoints from "./components/no-points";
 import {menus, filters, sortedWaypoints} from './data';
-import {renderComponent, unrenderComponent} from "./utils";
+import {renderComponent, unrenderComponent, Position} from "./utils";
 import TripController from "./controllers/trip-controller";
+import Statistics from "./components/statistics";
 
 const tripInfoContainer = document.querySelector(`.trip-info`);
 const controlsContainer = document.querySelector(`.trip-controls`);
@@ -17,9 +18,9 @@ const tripCostValue = document.querySelector(`.trip-info__cost-value`);
  *             description: string,
  *             time: {
  *               duration: {
- *                 days: string,
- *                 hours: string,
- *                 minutes: string
+ *                 days: number,
+ *                 hours: number,
+ *                 minutes: number
  *               },
  *               endTime: number,
  *               startTime: number
@@ -78,6 +79,7 @@ const getDaysData = () => {
       oldStateMonth = new Date(it.time.startTime).getMonth();
     });
   }
+
   return dates;
 };
 
@@ -89,20 +91,47 @@ const generatePageElements = () => {
       Array.from(mainContainer.children).forEach((it) => {
         unrenderComponent(it);
       });
-      renderComponent(mainContainer, new NoPoints().getElement(), `beforeend`);
+      renderComponent(mainContainer, new NoPoints().getElement(), Position.BEFOREEND);
     }
   };
 
-  renderComponent(tripInfoContainer, new TripInfo().getElement(), `afterbegin`);
-  renderComponent(controlsContainer, new Menu(menus).getElement(), `beforeend`);
-  renderComponent(controlsContainer, new Filters(filters).getElement(), `beforeend`);
+  renderComponent(tripInfoContainer, new TripInfo().getElement(), Position.AFTERBEGIN);
+  renderComponent(controlsContainer, new Menu(menus).getElement(), Position.BEFOREEND);
+  renderComponent(controlsContainer, new Filters(filters).getElement(), Position.BEFOREEND);
+  renderComponent(mainContainer, new Statistics().getElement(), Position.BEFOREEND);
 
   const tripDaysData = getDaysData();
   const tripController = new TripController(mainContainer, sortedWaypoints, tripDaysData);
 
   tripController.init();
   tripCostValue.textContent = `${getTripCostValue(sortedWaypoints)}`;
+  tripController._hideStatistics();
   checkTasksState();
+  document.querySelector(`.trip-tabs`).addEventListener(`click`, (evt) => {
+    evt.preventDefault();
+
+    if (evt.target.tagName !== `A`) {
+      return;
+    }
+
+    switch (evt.target.text) {
+      case `Table`:
+        evt.currentTarget.children[1].classList.remove(`trip-tabs__btn--active`);
+        evt.target.classList.add(`trip-tabs__btn--active`);
+        tripController._hideStatistics();
+        break;
+
+      case `Stats`:
+        evt.currentTarget.children[0].classList.remove(`trip-tabs__btn--active`);
+        evt.target.classList.add(`trip-tabs__btn--active`);
+        tripController._showStatistics();
+        break;
+    }
+  });
+
+  document.querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, () => {
+    tripController._createTripWaypoint();
+  });
 };
 
 generatePageElements();

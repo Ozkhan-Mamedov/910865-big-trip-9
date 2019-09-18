@@ -3,72 +3,11 @@ import {
   MIN_SENTENCE_NUMBER, MAX_SENTENCE_NUMBER, MAX_PHOTOS_NUMBER,
   WAYPOINTS_NUMBER, HOURS_IN_DAY, MINUTES_IN_HOUR, SECONDS_IN_MINUTE,
   MSECONDS_IN_SECOND, MAX_TIME_RANGE, MIN_TIME_RANGE, DAYS_IN_WEEK,
-  MIN_PRICE_RANGE, MAX_PRICE_RANGE, MAX_OFFERS_RANGE
+  MIN_PRICE_RANGE, MAX_PRICE_RANGE, MAX_OFFERS_RANGE, waypointType, additionalOffers,
+  cities, waypointTypeNames
 } from "./constants";
+import moment from "moment";
 
-const waypointType = {
-  'bus': {
-    address: `bus.png`,
-    template: `Bus to`,
-  },
-  'hotel': {
-    address: `check-in.png`,
-    template: `Check in`,
-  },
-  'car': {
-    address: `drive.png`,
-    template: `Drive to`,
-  },
-  'plane': {
-    address: `flight.png`,
-    template: `Flight to`,
-  },
-  'restaurant': {
-    address: `restaurant.png`,
-    template: `Eat at`,
-  },
-  'ship': {
-    address: `ship.png`,
-    template: `Ship to`,
-  },
-  'sight': {
-    address: `sightseeing.png`,
-    template: `Sightseeing at`,
-  },
-  'taxi': {
-    address: `taxi.png`,
-    template: `Taxi to`,
-  },
-  'train': {
-    address: `train.png`,
-    template: `Train to`,
-  },
-  'transport': {
-    address: `transport.png`,
-    template: `Transport to`,
-  },
-};
-const waypointTypeNames = [
-  `bus`,
-  `hotel`,
-  `car`,
-  `plane`,
-  `restaurant`,
-  `ship`,
-  `sight`,
-  `taxi`,
-  `train`,
-  `transport`
-];
-const cities = [
-  `Venice`,
-  `Budapest`,
-  `Paris`,
-  `Brugge`,
-  `Amsterdam`,
-  `Athens`,
-  `Sydney`
-];
 const description = [
   `Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
   `Cras aliquet varius magna, non porta ligula feugiat eget.`,
@@ -81,38 +20,6 @@ const description = [
   `Aliquam erat volutpat.`,
   `Nunc fermentum tortor ac porta dapibus.`,
   `In rutrum ac purus sit amet tempus.`];
-const additionalOffers = [
-  {
-    id: `luggage`,
-    title: `Add luggage`,
-    price: 30,
-    isSelected: Boolean(Math.round(Math.random())),
-  },
-  {
-    id: `comfort`,
-    title: `Switch to comfort class`,
-    price: 100,
-    isSelected: Boolean(Math.round(Math.random())),
-  },
-  {
-    id: `meal`,
-    title: `Add meal`,
-    price: 15,
-    isSelected: Boolean(Math.round(Math.random())),
-  },
-  {
-    id: `seats`,
-    title: `Choose seats`,
-    price: 5,
-    isSelected: Boolean(Math.round(Math.random())),
-  },
-  {
-    id: `train`,
-    title: `Travel by train`,
-    price: 40,
-    isSelected: Boolean(Math.round(Math.random())),
-  }
-];
 
 /**
  * @return { { address : string,
@@ -179,29 +86,22 @@ const getWaypointDescription = (descriptions) => {
 };
 
 /**
- * @return { {duration: {hours: (string|number), minutes: (string|number), days: (string|number)},
- *            startTime: number,
- *            endTime: number} }
+ * @return { {startTime: number,
+ *            endTime: number,
+ *            duration: {
+ *              minutes: number,
+ *              hours: number,
+ *              days: number }
+ *            } }
  */
 const getTime = () => {
   const randomDate = Date.now() + getRandomNumber(0, DAYS_IN_WEEK) * HOURS_IN_DAY * MINUTES_IN_HOUR * SECONDS_IN_MINUTE * MSECONDS_IN_SECOND;
   const startTime = randomDate - getRandomNumber(MIN_TIME_RANGE, MAX_TIME_RANGE);
   const endTime = randomDate + getRandomNumber(MIN_TIME_RANGE, MAX_TIME_RANGE);
-  const diff = Math.abs(endTime - startTime);
-
-  let minutes = Math.floor((diff / MSECONDS_IN_SECOND) / SECONDS_IN_MINUTE) % SECONDS_IN_MINUTE;
-  let hours = Math.floor(diff / MSECONDS_IN_SECOND / SECONDS_IN_MINUTE / MINUTES_IN_HOUR) % HOURS_IN_DAY;
-  let days = Math.floor((diff / MSECONDS_IN_SECOND / SECONDS_IN_MINUTE / MINUTES_IN_HOUR) / HOURS_IN_DAY);
-
-  if (minutes < 10) {
-    minutes = `0${minutes}`;
-  }
-  if (hours < 10) {
-    hours = `0${hours}`;
-  }
-  if (days < 10) {
-    days = `0${days}`;
-  }
+  const diff = moment.duration(endTime - startTime, `milliseconds`);
+  const days = diff.days();
+  const hours = diff.hours();
+  const minutes = diff.minutes();
 
   return {
     startTime,
@@ -220,9 +120,9 @@ const getTime = () => {
  *             description: string,
  *             time: {
  *               duration: {
- *                 days: string,
- *                 hours: string,
- *                 minutes: string
+ *                 days: number,
+ *                 hours: number,
+ *                 minutes: number
  *               },
  *               endTime: number,
  *               startTime: number
@@ -245,9 +145,21 @@ const getWaypoint = () => ({
 });
 
 /**
- * @param { { time: { startTime: number,
+ * @param { { time: {
+ *                    duration: {
+ *                      days: number,
+ *                      hours: number,
+ *                      minutes: number
+ *                    },
+ *                    startTime: number,
  *                    endTime: number } } } a
- * @param { { time: { startTime: number,
+ * @param { { time: {
+ *                    duration: {
+ *                      days: number,
+ *                      hours: number,
+ *                      minutes: number
+ *                    },
+ *                    startTime: number,
  *                    endTime: number } } } b
  * @return {number}
  */

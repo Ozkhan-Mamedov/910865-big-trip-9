@@ -1,4 +1,5 @@
 import AbstractComponent from "./abstract-components";
+import moment from 'moment';
 
 /**
  * @param { [ {
@@ -44,6 +45,14 @@ const getUniqueTripDays = (tripDays) => {
 };
 
 class Day extends AbstractComponent {
+  /**
+   * @param { [ {
+   *   tripDay: number,
+   *   day: number,
+   *   month: string,
+   *   dayCode: number
+   *        } ] } tripDaysData
+   */
   constructor(tripDaysData) {
     super();
     this._tripDaysData = tripDaysData;
@@ -53,12 +62,14 @@ class Day extends AbstractComponent {
    * @return {string}
    */
   getTemplate() {
+    const uniqueDays = getUniqueTripDays(this._tripDaysData);
+
     return `
-      ${this._tripDaysData.map((it, index) => ((index < getDayNumber(this._tripDaysData))) ? `
+      ${this._tripDaysData.map((it, index, arr) => ((index < getDayNumber(this._tripDaysData))) ? `
       <li class="trip-days__item  day">
         <div class="day__info">
-          <span class="day__counter">${getUniqueTripDays(this._tripDaysData)[index]}</span>
-          <time class="day__date" datetime="${new Date(it.dayCode).toISOString().substr(0, 10)}">${it.month} ${it.day}</time>
+          <span class="day__counter">${uniqueDays[index]}</span>
+          <time class="day__date" datetime="${moment(arr[arr.findIndex((tripItem) => tripItem.tripDay === uniqueDays[index])].dayCode).format(`YYYY-MM-DD`)}">${arr[arr.findIndex((tripItem) => tripItem.tripDay === uniqueDays[index])].month} ${arr[arr.findIndex((tripItem) => tripItem.tripDay === uniqueDays[index])].day}</time>
         </div>
         <ul class="trip-events__list">
         </ul>

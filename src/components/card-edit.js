@@ -1,5 +1,6 @@
 import {cities} from "../data";
 import AbstractComponent from "./abstract-components";
+import moment from 'moment';
 
 /**
  * @param { [ { offers: Set < {} >,
@@ -7,9 +8,9 @@ import AbstractComponent from "./abstract-components";
  *             description: string,
  *             time: {
  *               duration: {
- *                 days: string,
- *                 hours: string,
- *                 minutes: string
+ *                 days: number,
+ *                 hours: number,
+ *                 minutes: number
  *               },
  *               endTime: number,
  *               startTime: number
@@ -79,9 +80,9 @@ class CardEdit extends AbstractComponent {
    *             description: string,
    *             time: {
    *               duration: {
-   *                 days: string,
-   *                 hours: string,
-   *                 minutes: string
+   *                 days: number,
+   *                 hours: number,
+   *                 minutes: number
    *               },
    *               endTime: number,
    *               startTime: number
@@ -123,37 +124,37 @@ class CardEdit extends AbstractComponent {
                 <legend class="visually-hidden">Transfer</legend>
   
                 <div class="event__type-item">
-                  <input id="event-type-taxi-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="taxi">
+                  <input id="event-type-taxi-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="taxi" ${this._type.address === `taxi.png` ? `checked=""` : ``}>
                   <label class="event__type-label  event__type-label--taxi" for="event-type-taxi-1">Taxi</label>
                 </div>
   
                 <div class="event__type-item">
-                  <input id="event-type-bus-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="bus">
+                  <input id="event-type-bus-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="bus" ${this._type.address === `bus.png` ? `checked=""` : ``}>
                   <label class="event__type-label  event__type-label--bus" for="event-type-bus-1">Bus</label>
                 </div>
   
                 <div class="event__type-item">
-                  <input id="event-type-train-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="train">
+                  <input id="event-type-train-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="train" ${this._type.address === `train.png` ? `checked=""` : ``}>
                   <label class="event__type-label  event__type-label--train" for="event-type-train-1">Train</label>
                 </div>
   
                 <div class="event__type-item">
-                  <input id="event-type-ship-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="ship">
+                  <input id="event-type-ship-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="ship" ${this._type.address === `ship.png` ? `checked=""` : ``}>
                   <label class="event__type-label  event__type-label--ship" for="event-type-ship-1">Ship</label>
                 </div>
   
                 <div class="event__type-item">
-                  <input id="event-type-transport-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="transport">
+                  <input id="event-type-transport-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="transport" ${this._type.address === `transport.png` ? `checked=""` : ``}>
                   <label class="event__type-label  event__type-label--transport" for="event-type-transport-1">Transport</label>
                 </div>
   
                 <div class="event__type-item">
-                  <input id="event-type-drive-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="drive">
+                  <input id="event-type-drive-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="drive" ${this._type.address === `drive.png` ? `checked=""` : ``}>
                   <label class="event__type-label  event__type-label--drive" for="event-type-drive-1">Drive</label>
                 </div>
   
                 <div class="event__type-item">
-                  <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight" checked="">
+                  <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight" ${this._type.address === `flight.png` ? `checked=""` : ``}>
                   <label class="event__type-label  event__type-label--flight" for="event-type-flight-1">Flight</label>
                 </div>
               </fieldset>
@@ -162,17 +163,17 @@ class CardEdit extends AbstractComponent {
                 <legend class="visually-hidden">Activity</legend>
   
                 <div class="event__type-item">
-                  <input id="event-type-check-in-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="check-in">
+                  <input id="event-type-check-in-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="check-in" ${this._type.address === `check-in.png` ? `checked=""` : ``}>
                   <label class="event__type-label  event__type-label--check-in" for="event-type-check-in-1">Check-in</label>
                 </div>
   
                 <div class="event__type-item">
-                  <input id="event-type-sightseeing-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="sightseeing">
+                  <input id="event-type-sightseeing-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="sightseeing" ${this._type.address === `sightseeing.png` ? `checked=""` : ``}>
                   <label class="event__type-label  event__type-label--sightseeing" for="event-type-sightseeing-1">Sightseeing</label>
                 </div>
   
                 <div class="event__type-item">
-                  <input id="event-type-restaurant-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="restaurant">
+                  <input id="event-type-restaurant-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="restaurant" ${this._type.address === `restaurant.png` ? `checked=""` : ``}>
                   <label class="event__type-label  event__type-label--restaurant" for="event-type-restaurant-1">Restaurant</label>
                 </div>
               </fieldset>
@@ -193,12 +194,12 @@ class CardEdit extends AbstractComponent {
             <label class="visually-hidden" for="event-start-time-1">
               From
             </label>
-            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${new Date(this._time.startTime).getDate()}/${(new Date(this._time.startTime).getMonth() + 1) < 10 ? `0${new Date(this._time.startTime).getMonth() + 1}` : `${new Date(this._time.startTime).getMonth() + 1}`}/${new Date(this._time.startTime).getFullYear().toString().substr(2, 4)} ${new Date(this._time.startTime).toTimeString().substr(0, 5)}">
+            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${moment(this._time.startTime).format(`DD/MM/YY HH:mm`)}">
             —
             <label class="visually-hidden" for="event-end-time-1">
               To
             </label>
-            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${new Date(this._time.endTime).getDate()}/${(new Date(this._time.endTime).getMonth() + 1) < 10 ? `0${new Date(this._time.endTime).getMonth() + 1}` : `${new Date(this._time.endTime).getMonth() + 1}`}/${new Date(this._time.endTime).getFullYear().toString().substr(2, 4)} ${new Date(this._time.endTime).toTimeString().substr(0, 5)}">
+            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${moment(this._time.endTime).format(`DD/MM/YY HH:mm`)}">
           </div>
   
           <div class="event__field-group  event__field-group--price">
@@ -232,7 +233,7 @@ class CardEdit extends AbstractComponent {
             <div class="event__available-offers">
             
               <div class="event__offer-selector">
-                <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" ${getOffersStatus(this._offers, `luggage`) ? `checked=""` : ``}>
+                <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer" value="luggage" ${getOffersStatus(this._offers, `luggage`) ? `checked=""` : ``}>
                 <label class="event__offer-label" for="event-offer-luggage-1">
                   <span class="event__offer-title">Add luggage</span>
                   +
@@ -241,7 +242,7 @@ class CardEdit extends AbstractComponent {
               </div>
   
               <div class="event__offer-selector">
-                <input class="event__offer-checkbox  visually-hidden" id="event-offer-comfort-1" type="checkbox" name="event-offer-comfort" ${getOffersStatus(this._offers, `comfort`) ? `checked=""` : ``}>
+                <input class="event__offer-checkbox  visually-hidden" id="event-offer-comfort-1" type="checkbox" name="event-offer" value="comfort" ${getOffersStatus(this._offers, `comfort`) ? `checked=""` : ``}>
                 <label class="event__offer-label" for="event-offer-comfort-1">
                   <span class="event__offer-title">Switch to comfort class</span>
                   +
@@ -250,7 +251,7 @@ class CardEdit extends AbstractComponent {
               </div>
   
               <div class="event__offer-selector">
-                <input class="event__offer-checkbox  visually-hidden" id="event-offer-meal-1" type="checkbox" name="event-offer-meal" ${getOffersStatus(this._offers, `meal`) ? `checked=""` : ``}>
+                <input class="event__offer-checkbox  visually-hidden" id="event-offer-meal-1" type="checkbox" name="event-offer" value="meal" ${getOffersStatus(this._offers, `meal`) ? `checked=""` : ``}>
                 <label class="event__offer-label" for="event-offer-meal-1">
                   <span class="event__offer-title">Add meal</span>
                   +
@@ -259,7 +260,7 @@ class CardEdit extends AbstractComponent {
               </div>
   
               <div class="event__offer-selector">
-                <input class="event__offer-checkbox  visually-hidden" id="event-offer-seats-1" type="checkbox" name="event-offer-seats" ${getOffersStatus(this._offers, `seats`) ? `checked=""` : ``}>
+                <input class="event__offer-checkbox  visually-hidden" id="event-offer-seats-1" type="checkbox" name="event-offer" value="seats" ${getOffersStatus(this._offers, `seats`) ? `checked=""` : ``}>
                 <label class="event__offer-label" for="event-offer-seats-1">
                   <span class="event__offer-title">Choose seats</span>
                   +
@@ -268,7 +269,7 @@ class CardEdit extends AbstractComponent {
               </div>
   
               <div class="event__offer-selector">
-                <input class="event__offer-checkbox  visually-hidden" id="event-offer-train-1" type="checkbox" name="event-offer-train" ${getOffersStatus(this._offers, `train`) ? `checked=""` : ``}>
+                <input class="event__offer-checkbox  visually-hidden" id="event-offer-train-1" type="checkbox" name="event-offer" value="train" ${getOffersStatus(this._offers, `train`) ? `checked=""` : ``}>
                 <label class="event__offer-label" for="event-offer-train-1">
                   <span class="event__offer-title">Travel by train</span>
                   +

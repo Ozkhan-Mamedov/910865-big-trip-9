@@ -1,14 +1,14 @@
-import {renderComponent} from "../utils";
+import {renderComponent, unrenderComponent, getRandomNumber, Position} from "../utils";
 import CardBoard from "../components/card-board";
 import Day from "../components/day-container";
-import Card from "../components/card";
 import Sort from "../components/sort";
-import CardEdit from "../components/card-edit";
+import PointController from "./point-controller";
+import {cities, TripControllerMode, waypointTypeNames, waypointType} from "../constants";
 
 class TripController {
   /**
    * @param {Element} container
-   * @param { [{duration: {hours: (string|number), minutes: (string|number), days: (string|number)},
+   * @param { [{duration: {hours: number, minutes: number, days: number},
    *            startTime: number,
    *            endTime: number}] } waypoints
    * @param { [ {
@@ -26,99 +26,158 @@ class TripController {
     this._board = new CardBoard();
     this._sort = new Sort();
     this._dayElement = new Day(tripDaysData).getElement();
+    this._subscriptions = [];
+    this._creatingWaypoint = null;
+    this._onDataChange = this._onDataChange.bind(this);
+    this._onChangeView = this._onChangeView.bind(this);
   }
 
   init() {
-    renderComponent(this._container, this._sort.getElement(), `beforeend`);
-    renderComponent(this._container, this._board.getElement(), `beforeend`);
-    renderComponent(this._board.getElement().firstElementChild, this._dayElement, `beforeend`);
+    renderComponent(this._container, this._sort.getElement(), Position.BEFOREEND);
+    renderComponent(this._container, this._board.getElement(), Position.BEFOREEND);
+    renderComponent(this._board.getElement().firstElementChild, this._dayElement, Position.BEFOREEND);
 
-    this._waypoints.forEach((it, index) => {
-      this._renderTripWaypoint(it, index);
+    this._waypoints.forEach((it, dayIndex) => {
+      if ((dayIndex > 0) && (this._tripDaysData[dayIndex].tripDay !== this._tripDaysData[dayIndex - 1].tripDay)) {
+        this._eventContainerIndex++;
+      }
+
+      this._renderTripWaypoint(it, this._eventContainerIndex);
     });
 
     this._sort.getElement().querySelector(`.trip-sort`).addEventListener(`click`, (evt) => this._onSortElementClick(evt));
   }
 
   /**
-   * @param {{duration: {hours: (string|number), minutes: (string|number), days: (string|number)},
+   * @param {{duration: {hours: number, minutes: number, days: number},
    *            startTime: number,
    *            endTime: number}} tripWaypoint
-   * @param {number} index
+   * @param {number} containerIndex
    * @private
    */
-  _renderTripWaypoint(tripWaypoint, index) {
-    const cardComponent = new Card(tripWaypoint).getElement();
-    const cardEditComponent = new CardEdit(tripWaypoint).getElement();
+  _renderTripWaypoint(tripWaypoint, containerIndex) {
+    const pointController = new PointController(this._dayElement.querySelectorAll(`.trip-events__list`)[containerIndex], tripWaypoint, TripControllerMode.DEFAULT, this._onDataChange, this._onChangeView);
 
-    /**
-     * @param {KeyboardEvent} keyEvt
-     */
-    const onEscKeyDown = (keyEvt) => {
-      if (keyEvt.key === `Escape` || keyEvt.key === `Esc`) {
-        cardEditComponent.parentNode.replaceChild(cardComponent, cardEditComponent);
-        document.removeEventListener(`keydown`, onEscKeyDown);
-      }
-    };
+    this._subscriptions.push(pointController.setDefaultView.bind(pointController));
+  }
 
-    /**
-     * @param {Event} evt
-     */
-    const onFormSubmit = (evt) => {
-      evt.preventDefault();
-      onRollbackButtonClick();
-      cardEditComponent.querySelector(`.event--edit`).removeEventListener(`submit`, onFormSubmit);
-      document.removeEventListener(`keydown`, onEscKeyDown);
-    };
-
-    const onRollbackButtonClick = () => {
-      cardEditComponent.parentNode.replaceChild(cardComponent, cardEditComponent);
-      cardEditComponent.removeEventListener(`click`, onRollbackButtonClick);
-    };
-
-    const onRollupButtonClick = () => {
-      cardComponent.parentNode.replaceChild(cardEditComponent, cardComponent);
-      cardEditComponent.querySelector(`.event__rollup-btn`).addEventListener(`click`, onRollbackButtonClick);
-      cardComponent.removeEventListener(`click`, onRollupButtonClick);
-      cardEditComponent.querySelector(`.event--edit`).addEventListener(`submit`, onFormSubmit);
-      document.addEventListener(`keydown`, onEscKeyDown);
-    };
-
-    if ((index > 0) && (this._tripDaysData[index].tripDay !== this._tripDaysData[index - 1].tripDay)) {
-      this._eventContainerIndex++;
+  _createTripWaypoint() {
+    if (this._creatingWaypoint) {
+      return;
     }
-    renderComponent(this._dayElement.querySelectorAll(`.trip-events__list`)[this._eventContainerIndex], cardComponent, `beforeend`);
-    cardComponent.querySelector(`.event__rollup-btn`).addEventListener(`click`, onRollupButtonClick);
+
+    const defaultWaypoint = {
+      type: waypointType[waypointTypeNames[getRandomNumber(0, waypointTypeNames.length - 1)]],
+      city: cities[getRandomNumber(0, cities.length - 1)],
+      waypointPrice: 0,
+      time: {
+        startTime: new Date(),
+        endTime: new Date(),
+      },
+      description: ``,
+      photos: [],
+      offers: new Set(),
+    };
+    this._creatingWaypoint = new PointController(this._board.getElement().firstElementChild, defaultWaypoint, TripControllerMode.ADDING, this._onDataChange, this._onChangeView);
   }
 
   /**
-   * @param {Event} evt
+   * @param { { offers: Set < {} >,
+   *             city: string,
+   *             description: string,
+   *             time: {
+   *               duration: {
+   *                 days: number,
+   *                 hours: number,
+   *                 minutes: number
+   *               },
+   *               endTime: number,
+   *               startTime: number
+   *             },
+   *             type: {
+   *               address: string,
+   *               template: string
+   *             },
+   *             waypointPrice: number,
+   *             photos: [string] } } newData
+   * @param { { offers: Set < {} >,
+   *             city: string,
+   *             description: string,
+   *             time: {
+   *               duration: {
+   *                 days: number,
+   *                 hours: number,
+   *                 minutes: number
+   *               },
+   *               endTime: number,
+   *               startTime: number
+   *             },
+   *             type: {
+   *               address: string,
+   *               template: string
+   *             },
+   *             waypointPrice: number,
+   *             photos: [string] } } oldData
+   * @private
+   */
+  _onDataChange(newData, oldData) {
+    this._waypoints[this._waypoints.findIndex((it) => it === oldData)] = newData;
+    if (newData === null) {
+      this._waypoints.splice(this._waypoints.findIndex((it) => it === newData), 1);
+    }
+    if (oldData === null) {
+      this._waypoints.unshift(newData);
+      this._creatingWaypoint = null;
+    }
+    unrenderComponent(this._board.getElement());
+    this._board = new CardBoard();
+    renderComponent(this._container, this._board.getElement(), Position.BEFOREEND);
+    this._dayElement = new Day(this._tripDaysData).getElement();
+    renderComponent(this._board.getElement().firstElementChild, this._dayElement, Position.BEFOREEND); // ?
+    this._eventContainerIndex = 0;
+    this._waypoints.forEach((it, dayIndex) => {
+      if ((dayIndex > 0) && (this._tripDaysData[dayIndex].tripDay !== this._tripDaysData[dayIndex - 1].tripDay)) {
+        this._eventContainerIndex++;
+      }
+      this._renderTripWaypoint(it, this._eventContainerIndex);
+    });
+  }
+
+  _onChangeView() {
+    this._subscriptions.forEach((subscription) => subscription());
+  }
+
+  /**
+   * @param {MouseEvent} evt
    * @private
    */
   _onSortElementClick(evt) {
     const clearDaysData = () => {
       document.querySelectorAll(`.day__counter`).forEach((it) => {
-        it.innerHTML = ``;
+        unrenderComponent(it);
       });
       document.querySelectorAll(`.day__date`).forEach((it) => {
-        it.innerHTML = ``;
+        unrenderComponent(it);
       });
     };
 
     if (evt.target.tagName !== `INPUT`) {
       return;
     }
-    this._board.getElement().firstElementChild.innerHTML = ``;
+    unrenderComponent(this._board.getElement());
     this._board = new CardBoard();
+    renderComponent(this._container, this._board.getElement(), Position.BEFOREEND);
     this._dayElement = new Day(this._tripDaysData).getElement();
     this._eventContainerIndex = 0;
-    renderComponent(this._container, this._board.getElement(), `beforeend`);
-    renderComponent(this._board.getElement().firstElementChild, this._dayElement, `beforeend`);
+    renderComponent(this._board.getElement().firstElementChild, this._dayElement, Position.BEFOREEND);
 
     switch (evt.target.dataset.sortType) {
       case `event`:
         this._waypoints.forEach((it, index) => {
-          this._renderTripWaypoint(it, index);
+          if ((index > 0) && (this._tripDaysData[index].tripDay !== this._tripDaysData[index - 1].tripDay)) {
+            this._eventContainerIndex++;
+          }
+          this._renderTripWaypoint(it, this._eventContainerIndex);
         });
         break;
 
@@ -126,18 +185,36 @@ class TripController {
         this._waypoints.slice()
           .sort((a, b) => (parseInt(a.time.duration.days, 10) - parseInt(b.time.duration.days, 10)) || (parseInt(a.time.duration.hours, 10) - parseInt(b.time.duration.hours, 10)) || (parseInt(a.time.duration.minutes, 10) - parseInt(b.time.duration.minutes, 10)))
           .forEach((it, index) => {
-            this._renderTripWaypoint(it, index);
+            if ((index > 0) && (this._tripDaysData[index].tripDay !== this._tripDaysData[index - 1].tripDay)) {
+              this._eventContainerIndex++;
+            }
+            this._renderTripWaypoint(it, this._eventContainerIndex);
           });
         clearDaysData();
         break;
 
       case `price`:
         this._waypoints.slice().sort((a, b) => a.waypointPrice - b.waypointPrice).forEach((it, index) => {
-          this._renderTripWaypoint(it, index);
+          if ((index > 0) && (this._tripDaysData[index].tripDay !== this._tripDaysData[index - 1].tripDay)) {
+            this._eventContainerIndex++;
+          }
+          this._renderTripWaypoint(it, this._eventContainerIndex);
         });
         clearDaysData();
         break;
     }
+  }
+
+  _showStatistics() {
+    document.querySelector(`.statistics`).classList.remove(`visually-hidden`);
+    this._board.getElement().classList.add(`visually-hidden`);
+    this._sort.getElement().classList.add(`visually-hidden`);
+  }
+
+  _hideStatistics() {
+    document.querySelector(`.statistics`).classList.add(`visually-hidden`);
+    this._board.getElement().classList.remove(`visually-hidden`);
+    this._sort.getElement().classList.remove(`visually-hidden`);
   }
 }
 
