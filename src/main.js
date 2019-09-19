@@ -135,3 +135,6 @@ const generatePageElements = () => {
 };
 
 generatePageElements();
+document.querySelector(`.page-header__logo`).addEventListener(`click`, () => {
+  console.log(sortedWaypoints);
+});

@@ -1,9 +1,11 @@
-import {renderComponent, unrenderComponent, getRandomNumber, Position} from "../utils";
+import {getRandomNumber, Position, renderComponent, unrenderComponent} from "../utils";
 import CardBoard from "../components/card-board";
 import Day from "../components/day-container";
 import Sort from "../components/sort";
 import PointController from "./point-controller";
-import {cities, TripControllerMode, waypointTypeNames, waypointType} from "../constants";
+import {cities, colors, TripControllerMode, waypointType, waypointTypeNames} from "../constants";
+import Chart from 'chart.js';
+import moment from "moment";
 
 class TripController {
   /**
@@ -62,7 +64,8 @@ class TripController {
   }
 
   _createTripWaypoint() {
-    if (this._creatingWaypoint) {
+    if (this._creatingWaypoint !== null) {
+      // unrenderComponent(this._creatingWaypoint._container.firstElementChild.firstElementChild);
       return;
     }
 
@@ -74,10 +77,9 @@ class TripController {
         startTime: new Date(),
         endTime: new Date(),
       },
-      description: ``,
-      photos: [],
       offers: new Set(),
     };
+
     this._creatingWaypoint = new PointController(this._board.getElement().firstElementChild, defaultWaypoint, TripControllerMode.ADDING, this._onDataChange, this._onChangeView);
   }
 
@@ -206,13 +208,218 @@ class TripController {
   }
 
   _showStatistics() {
-    document.querySelector(`.statistics`).classList.remove(`visually-hidden`);
+    const moneyCtx = this._container.querySelector(`.statistics__chart--money`);
+    const transportCtx = this._container.querySelector(`.statistics__chart--transport`);
+    const timeCtx = this._container.querySelector(`.statistics__chart--time`);
+    const moneyChart = new Chart(moneyCtx, {
+      type: `pie`,
+      data: {
+        labels: waypointTypeNames.filter((name) => {
+          return this._waypoints.some((it) => {
+            return it.type === waypointType[name];
+          });
+        }),
+        datasets: [{
+          data: waypointTypeNames.map((name) => {
+            let sum = 0;
+
+            this._waypoints.forEach((it) => {
+              if (it.type === waypointType[name]) {
+                sum += it.waypointPrice;
+              }
+            });
+
+            return sum;
+          }).filter((sum) => sum !== 0),
+          backgroundColor: [...colors]
+        }]
+      },
+      options: {
+        plugins: {
+          datalabels: {
+            display: false
+          }
+        },
+        tooltips: {
+          callbacks: {
+            label: (tooltipItem, data) => {
+              const allData = data.datasets[tooltipItem.datasetIndex].data;
+              const tooltipData = allData[tooltipItem.index];
+              const total = allData.reduce((acc, it) => acc + parseFloat(it));
+              const tooltipPercentage = Math.round((tooltipData / total) * 100);
+
+              return `SPENT € ${tooltipData} — ${tooltipPercentage}%`;
+            }
+          },
+          displayColors: false,
+          backgroundColor: `#ffffff`,
+          bodyFontColor: `#000000`,
+          borderColor: `#000000`,
+          borderWidth: 1,
+          cornerRadius: 0,
+          xPadding: 15,
+          yPadding: 15
+        },
+        title: {
+          display: true,
+          text: `MONEY SPENT`,
+          fontSize: 30,
+          fontColor: `#000000`
+        },
+        legend: {
+          position: `left`,
+          labels: {
+            boxWidth: 26,
+            padding: 26,
+            fontStyle: 500,
+            fontColor: `#000000`,
+            fontSize: 27,
+          }
+        }
+      },
+    });
+    const transportChart = new Chart(transportCtx, {
+      type: `pie`,
+      data: {
+        labels: waypointTypeNames.filter((name) => {
+          return this._waypoints.some((it) => {
+            return it.type === waypointType[name];
+          });
+        }),
+        datasets: [{
+          data: waypointTypeNames.map((name) => {
+            let sum = 0;
+
+            this._waypoints.forEach((it) => {
+              if (it.type === waypointType[name]) {
+                sum++;
+              }
+            });
+
+            return sum;
+          }).filter((sum) => sum !== 0),
+          backgroundColor: [...colors]
+        }]
+      },
+      options: {
+        plugins: {
+          datalabels: {
+            display: false
+          }
+        },
+        tooltips: {
+          callbacks: {
+            label: (tooltipItem, data) => {
+              const allData = data.datasets[tooltipItem.datasetIndex].data;
+              const tooltipData = allData[tooltipItem.index];
+              const total = allData.reduce((acc, it) => acc + parseFloat(it));
+              const tooltipPercentage = Math.round((tooltipData / total) * 100);
+
+              return `USED ${tooltipData} TIME(s) — ${tooltipPercentage}%`;
+            }
+          },
+          displayColors: false,
+          backgroundColor: `#ffffff`,
+          bodyFontColor: `#000000`,
+          borderColor: `#000000`,
+          borderWidth: 1,
+          cornerRadius: 0,
+          xPadding: 15,
+          yPadding: 15
+        },
+        title: {
+          display: true,
+          text: `TRANSPORT USED`,
+          fontSize: 30,
+          fontColor: `#000000`
+        },
+        legend: {
+          position: `left`,
+          labels: {
+            boxWidth: 26,
+            padding: 26,
+            fontStyle: 500,
+            fontColor: `#000000`,
+            fontSize: 27,
+          }
+        }
+      },
+    });
+    const timeChart = new Chart(timeCtx, {
+      type: `pie`,
+      data: {
+        labels: waypointTypeNames.filter((name) => {
+          return this._waypoints.some((it) => {
+            return it.type === waypointType[name];
+          });
+        }),
+        datasets: [{
+          data: waypointTypeNames.map((name) => {
+            let sum = 0;
+
+            this._waypoints.forEach((it) => {
+              if (it.type === waypointType[name]) {
+                sum += it.time.endTime - it.time.startTime;
+              }
+            });
+
+            return sum;
+          }).filter((result) => result !== 0),
+          backgroundColor: [...colors]
+        }]
+      },
+      options: {
+        plugins: {
+          datalabels: {
+            display: false
+          }
+        },
+        tooltips: {
+          callbacks: {
+            label: (tooltipItem, data) => {
+              const allData = data.datasets[tooltipItem.datasetIndex].data;
+              const tooltipData = allData[tooltipItem.index];
+              const total = allData.reduce((acc, it) => acc + parseFloat(it));
+              const tooltipPercentage = Math.round((tooltipData / total) * 100);
+
+              return `SPENT ${moment.duration(tooltipData).days()} day(s) ${moment.duration(tooltipData).hours()} hour(s) ${moment.duration(tooltipData).minutes()} minute(s) — ${tooltipPercentage}%`;
+            }
+          },
+          displayColors: false,
+          backgroundColor: `#ffffff`,
+          bodyFontColor: `#000000`,
+          borderColor: `#000000`,
+          borderWidth: 1,
+          cornerRadius: 0,
+          xPadding: 15,
+          yPadding: 15
+        },
+        title: {
+          display: true,
+          text: `TIME SPENT`,
+          fontSize: 30,
+          fontColor: `#000000`
+        },
+        legend: {
+          position: `left`,
+          labels: {
+            boxWidth: 26,
+            padding: 26,
+            fontStyle: 500,
+            fontColor: `#000000`,
+            fontSize: 27,
+          }
+        }
+      },
+    });
+
+    this._container.querySelector(`.statistics`).classList.remove(`visually-hidden`);
     this._board.getElement().classList.add(`visually-hidden`);
     this._sort.getElement().classList.add(`visually-hidden`);
   }
 
   _hideStatistics() {
-    document.querySelector(`.statistics`).classList.add(`visually-hidden`);
+    this._container.querySelector(`.statistics`).classList.add(`visually-hidden`);
     this._board.getElement().classList.remove(`visually-hidden`);
     this._sort.getElement().classList.remove(`visually-hidden`);
   }

@@ -127,6 +127,10 @@ const TripControllerMode = {
   ADDING: `adding`,
   DEFAULT: `default`
 };
+const colors = [
+  `#FF3CB9`, `#FFE125`, `#0C5CDD`, `#000000`, `#31B55C`,
+  `#FF0016`, `#06E9FF`, `#FF9209`, `#7940FF`, `#FFE899`
+];
 export {
   MIN_SENTENCE_NUMBER,
   MAX_SENTENCE_NUMBER,
@@ -149,5 +153,6 @@ export {
   waypointTypeNames,
   additionalOffers,
   cities,
-  TripControllerMode
+  TripControllerMode,
+  colors
 };

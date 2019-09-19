@@ -62,7 +62,6 @@ class PointController {
   init(mode) {
     let currentView = this._cardComponent;
     let renderPosition = Position.BEFOREEND;
-    let container = this._container;
 
     if (mode === TripControllerMode.ADDING) {
       renderPosition = Position.AFTERBEGIN;
@@ -236,7 +235,7 @@ class PointController {
       document.addEventListener(`keydown`, onEscKeyDown);
     };
 
-    renderComponent(container, currentView, renderPosition);
+    renderComponent(this._container, currentView, renderPosition);
     this._cardComponent.querySelector(`.event__rollup-btn`).addEventListener(`click`, onRollupButtonClick);
   }
 }
