@@ -183,11 +183,11 @@ for (let i = 0; i < WAYPOINTS_NUMBER; i++) {
 }
 
 const sortedWaypoints = waypoints.slice().sort(getSortedByDateList);
-console.log(sortedWaypoints);
 
 export {
   cities,
   menus,
   filters,
-  sortedWaypoints
+  sortedWaypoints,
+  getSortedByDateList
 };

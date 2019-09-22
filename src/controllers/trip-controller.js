@@ -1,8 +1,10 @@
-import {getRandomNumber, Position, renderComponent, unrenderComponent} from "../utils";
+import {getRandomNumber, Position, renderComponent, unrenderComponent, getDaysData} from "../utils";
+import {getSortedByDateList} from "../data";
 import CardBoard from "../components/card-board";
 import Day from "../components/day-container";
 import Sort from "../components/sort";
 import PointController from "./point-controller";
+import Statistics from "../components/statistics";
 import {cities, colors, TripControllerMode, waypointType, waypointTypeNames} from "../constants";
 import Chart from 'chart.js';
 import moment from "moment";
@@ -38,6 +40,7 @@ class TripController {
     renderComponent(this._container, this._sort.getElement(), Position.BEFOREEND);
     renderComponent(this._container, this._board.getElement(), Position.BEFOREEND);
     renderComponent(this._board.getElement().firstElementChild, this._dayElement, Position.BEFOREEND);
+    renderComponent(this._container, new Statistics().getElement(), Position.BEFOREEND);
 
     this._waypoints.forEach((it, dayIndex) => {
       if ((dayIndex > 0) && (this._tripDaysData[dayIndex].tripDay !== this._tripDaysData[dayIndex - 1].tripDay)) {
@@ -48,6 +51,10 @@ class TripController {
     });
 
     this._sort.getElement().querySelector(`.trip-sort`).addEventListener(`click`, (evt) => this._onSortElementClick(evt));
+  }
+
+  unrenderTripBoard() {
+    this._container.innerHTML = ``;
   }
 
   /**
@@ -65,7 +72,6 @@ class TripController {
 
   _createTripWaypoint() {
     if (this._creatingWaypoint !== null) {
-      // unrenderComponent(this._creatingWaypoint._container.firstElementChild.firstElementChild);
       return;
     }
 
@@ -81,6 +87,7 @@ class TripController {
     };
 
     this._creatingWaypoint = new PointController(this._board.getElement().firstElementChild, defaultWaypoint, TripControllerMode.ADDING, this._onDataChange, this._onChangeView);
+    this._creatingWaypoint = null;
   }
 
   /**
@@ -123,13 +130,16 @@ class TripController {
    * @private
    */
   _onDataChange(newData, oldData) {
-    this._waypoints[this._waypoints.findIndex((it) => it === oldData)] = newData;
+    if (oldData !== null && newData !== null) {
+      this._waypoints[this._waypoints.findIndex((it) => it === oldData)] = newData;
+    }
     if (newData === null) {
       this._waypoints.splice(this._waypoints.findIndex((it) => it === newData), 1);
     }
     if (oldData === null) {
       this._waypoints.unshift(newData);
-      this._creatingWaypoint = null;
+      this._waypoints.sort(getSortedByDateList);
+      this._tripDaysData = getDaysData(this._waypoints);
     }
     unrenderComponent(this._board.getElement());
     this._board = new CardBoard();
@@ -150,7 +160,7 @@ class TripController {
   }
 
   /**
-   * @param {MouseEvent} evt
+   * @param {Event} evt
    * @private
    */
   _onSortElementClick(evt) {

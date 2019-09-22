@@ -1,11 +1,10 @@
-import {getTargetMonth, TripInfo} from './components/trip-info';
+import {TripInfo} from './components/trip-info';
 import Menu from './components/menu';
 import Filters from './components/filters';
 import NoPoints from "./components/no-points";
 import {menus, filters, sortedWaypoints} from './data';
-import {renderComponent, unrenderComponent, Position} from "./utils";
+import {renderComponent, unrenderComponent, Position, getDaysData} from "./utils";
 import TripController from "./controllers/trip-controller";
-import Statistics from "./components/statistics";
 
 const tripInfoContainer = document.querySelector(`.trip-info`);
 const controlsContainer = document.querySelector(`.trip-controls`);
@@ -35,7 +34,7 @@ const tripCostValue = document.querySelector(`.trip-info__cost-value`);
  */
 const getTripCostValue = (waypointList) => {
   let sum = 0;
-  const additionalOffersPrice = document.querySelectorAll(`.event__offer-price`);
+  const additionalOffersPrice = mainContainer.querySelectorAll(`.event__offer-price`);
 
   waypointList.forEach((it) => {
     sum += it.waypointPrice;
@@ -48,42 +47,44 @@ const getTripCostValue = (waypointList) => {
   return sum;
 };
 
-/**
- * @return { [ {
- *   tripDay: number,
- *   day: number,
- *   month: string,
- *   dayCode: number
- *        } ] }
- */
-const getDaysData = () => {
-  let dates = [];
-
-  if (sortedWaypoints.length) {
-    let currentTripDay = 1;
-    let oldStateDate = new Date(sortedWaypoints[0].time.startTime).getDate();
-    let oldStateMonth = new Date(sortedWaypoints[0].time.startTime).getMonth();
-
-    sortedWaypoints.forEach((it) => {
-      if ((new Date(it.time.startTime).getDate() !== oldStateDate) || (new Date(it.time.startTime).getMonth() !== oldStateMonth)) {
-        currentTripDay++;
-      }
-
-      dates.push({
-        tripDay: currentTripDay,
-        day: new Date(it.time.startTime).getDate(),
-        month: getTargetMonth(new Date(it.time.startTime).getMonth()),
-        dayCode: it.time.startTime
-      });
-      oldStateDate = new Date(it.time.startTime).getDate();
-      oldStateMonth = new Date(it.time.startTime).getMonth();
-    });
-  }
-
-  return dates;
-};
-
 const generatePageElements = () => {
+  /**
+   * @param { [ { offers: Set < {} >,
+   *             city: string,
+   *             description: string,
+   *             time: {
+   *               duration: {
+   *                 days: number,
+   *                 hours: number,
+   *                 minutes: number
+   *               },
+   *               endTime: number,
+   *               startTime: number
+   *             },
+   *             type: {
+   *               address: string,
+   *               template: string
+   *             },
+   *             waypointPrice: number,
+   *             photos: [string] } ] } waypoints
+   */
+  const presetFilteredPage = (waypoints) => {
+    tripDaysData = getDaysData(waypoints);
+    tripController.unrenderTripBoard();
+    tripController = new TripController(mainContainer, waypoints, tripDaysData);
+    tripController.init();
+    controlsContainer.querySelector(`.trip-tabs`).children[1].classList.remove(`trip-tabs__btn--active`);
+    controlsContainer.querySelector(`.trip-tabs`).children[0].classList.add(`trip-tabs__btn--active`);
+    tripController._hideStatistics();
+  };
+
+  const onAddButtonClick = () => {
+    tripController._createTripWaypoint();
+    document.querySelector(`.event__reset-btn`).addEventListener(`click`, () => {
+      unrenderComponent(document.querySelector(`.event--edit`));
+    });
+  };
+
   const checkTasksState = () => {
     const boardContainer = mainContainer.querySelector(`.trip-days`);
 
@@ -98,16 +99,34 @@ const generatePageElements = () => {
   renderComponent(tripInfoContainer, new TripInfo().getElement(), Position.AFTERBEGIN);
   renderComponent(controlsContainer, new Menu(menus).getElement(), Position.BEFOREEND);
   renderComponent(controlsContainer, new Filters(filters).getElement(), Position.BEFOREEND);
-  renderComponent(mainContainer, new Statistics().getElement(), Position.BEFOREEND);
 
-  const tripDaysData = getDaysData();
-  const tripController = new TripController(mainContainer, sortedWaypoints, tripDaysData);
+  let tripDaysData = getDaysData(sortedWaypoints);
+  let tripController = new TripController(mainContainer, sortedWaypoints, tripDaysData);
 
   tripController.init();
   tripCostValue.textContent = `${getTripCostValue(sortedWaypoints)}`;
   tripController._hideStatistics();
   checkTasksState();
-  document.querySelector(`.trip-tabs`).addEventListener(`click`, (evt) => {
+  controlsContainer.querySelector(`.trip-filters`).addEventListener(`click`, (evt) => {
+    switch (evt.target.value) {
+      case `everything`:
+        presetFilteredPage(sortedWaypoints);
+        break;
+
+      case `future`:
+        const futureWaypoints = sortedWaypoints.filter((it) => it.time.startTime > Date.now());
+
+        presetFilteredPage(futureWaypoints);
+        break;
+
+      case `past`:
+        const pastWaypoints = sortedWaypoints.filter((it) => it.time.startTime < Date.now());
+
+        presetFilteredPage(pastWaypoints);
+        break;
+    }
+  });
+  controlsContainer.querySelector(`.trip-tabs`).addEventListener(`click`, (evt) => {
     evt.preventDefault();
 
     if (evt.target.tagName !== `A`) {
@@ -129,12 +148,7 @@ const generatePageElements = () => {
     }
   });
 
-  document.querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, () => {
-    tripController._createTripWaypoint();
-  });
+  document.querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, onAddButtonClick);
 };
 
 generatePageElements();
-document.querySelector(`.page-header__logo`).addEventListener(`click`, () => {
-  console.log(sortedWaypoints);
-});
