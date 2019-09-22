@@ -5,9 +5,10 @@ import Day from "../components/day-container";
 import Sort from "../components/sort";
 import PointController from "./point-controller";
 import Statistics from "../components/statistics";
-import {cities, colors, TripControllerMode, waypointType, waypointTypeNames} from "../constants";
+import {cities, TripControllerMode, waypointType, waypointTypeNames,
+  MSECONDS_IN_SECOND, SECONDS_IN_MINUTE, MINUTES_IN_HOUR, waypointTransportTypeNames} from "../constants";
 import Chart from 'chart.js';
-import moment from "moment";
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 class TripController {
   /**
@@ -145,7 +146,7 @@ class TripController {
     this._board = new CardBoard();
     renderComponent(this._container, this._board.getElement(), Position.BEFOREEND);
     this._dayElement = new Day(this._tripDaysData).getElement();
-    renderComponent(this._board.getElement().firstElementChild, this._dayElement, Position.BEFOREEND); // ?
+    renderComponent(this._board.getElement().firstElementChild, this._dayElement, Position.BEFOREEND);
     this._eventContainerIndex = 0;
     this._waypoints.forEach((it, dayIndex) => {
       if ((dayIndex > 0) && (this._tripDaysData[dayIndex].tripDay !== this._tripDaysData[dayIndex - 1].tripDay)) {
@@ -218,17 +219,20 @@ class TripController {
   }
 
   _showStatistics() {
+    Chart.defaults.global.defaultFontColor = `#000000`;
+    Chart.defaults.global.defaultFontSize = 14;
     const moneyCtx = this._container.querySelector(`.statistics__chart--money`);
     const transportCtx = this._container.querySelector(`.statistics__chart--transport`);
     const timeCtx = this._container.querySelector(`.statistics__chart--time`);
     const moneyChart = new Chart(moneyCtx, {
-      type: `pie`,
+      type: `horizontalBar`,
+      plugins: [ChartDataLabels],
       data: {
         labels: waypointTypeNames.filter((name) => {
           return this._waypoints.some((it) => {
             return it.type === waypointType[name];
           });
-        }),
+        }).map((filteredName) => filteredName.toUpperCase()),
         datasets: [{
           data: waypointTypeNames.map((name) => {
             let sum = 0;
@@ -241,61 +245,69 @@ class TripController {
 
             return sum;
           }).filter((sum) => sum !== 0),
-          backgroundColor: [...colors]
+          backgroundColor: `#ffffff`,
         }]
       },
       options: {
-        plugins: {
-          datalabels: {
-            display: false
-          }
-        },
-        tooltips: {
-          callbacks: {
-            label: (tooltipItem, data) => {
-              const allData = data.datasets[tooltipItem.datasetIndex].data;
-              const tooltipData = allData[tooltipItem.index];
-              const total = allData.reduce((acc, it) => acc + parseFloat(it));
-              const tooltipPercentage = Math.round((tooltipData / total) * 100);
-
-              return `SPENT € ${tooltipData} — ${tooltipPercentage}%`;
-            }
-          },
-          displayColors: false,
-          backgroundColor: `#ffffff`,
-          bodyFontColor: `#000000`,
-          borderColor: `#000000`,
-          borderWidth: 1,
-          cornerRadius: 0,
-          xPadding: 15,
-          yPadding: 15
-        },
         title: {
           display: true,
-          text: `MONEY SPENT`,
+          text: `MONEY`,
+          position: `left`,
           fontSize: 30,
+          padding: 30,
           fontColor: `#000000`
         },
-        legend: {
-          position: `left`,
-          labels: {
-            boxWidth: 26,
-            padding: 26,
-            fontStyle: 500,
-            fontColor: `#000000`,
-            fontSize: 27,
+        plugins: {
+          datalabels: {
+            display: true,
+            anchor: `end`,
+            align: `start`,
+            padding: 10,
+            formatter(value) {
+              return `€ ${value}`;
+            },
           }
+        },
+        scales: {
+          yAxes: [{
+            barPercentage: 1.1,
+            gridLines: {
+              display: false,
+              drawBorder: false
+            }
+          }],
+          xAxes: [{
+            minBarLength: 50,
+            ticks: {
+              display: false,
+              beginAtZero: true
+            },
+            gridLines: {
+              display: false,
+              drawBorder: false
+            }
+          }]
+        },
+        legend: {
+          display: false,
+        },
+        layout: {
+          paddingTop: 10
+        },
+        tooltips: {
+          enabled: true
         }
       },
     });
     const transportChart = new Chart(transportCtx, {
-      type: `pie`,
+      type: `horizontalBar`,
+      plugins: [ChartDataLabels],
       data: {
-        labels: waypointTypeNames.filter((name) => {
+        labels: waypointTransportTypeNames.filter((name) => {
           return this._waypoints.some((it) => {
             return it.type === waypointType[name];
           });
-        }),
+        }).map((filteredName) => filteredName.toUpperCase()),
         datasets: [{
           data: waypointTypeNames.map((name) => {
             let sum = 0;
@@ -308,63 +320,81 @@ class TripController {
 
             return sum;
           }).filter((sum) => sum !== 0),
-          backgroundColor: [...colors]
+          backgroundColor: `#ffffff`,
         }]
       },
       options: {
-        plugins: {
-          datalabels: {
-            display: false
-          }
-        },
-        tooltips: {
-          callbacks: {
-            label: (tooltipItem, data) => {
-              const allData = data.datasets[tooltipItem.datasetIndex].data;
-              const tooltipData = allData[tooltipItem.index];
-              const total = allData.reduce((acc, it) => acc + parseFloat(it));
-              const tooltipPercentage = Math.round((tooltipData / total) * 100);
-
-              return `USED ${tooltipData} TIME(s) — ${tooltipPercentage}%`;
-            }
-          },
-          displayColors: false,
-          backgroundColor: `#ffffff`,
-          bodyFontColor: `#000000`,
-          borderColor: `#000000`,
-          borderWidth: 1,
-          cornerRadius: 0,
-          xPadding: 15,
-          yPadding: 15
-        },
         title: {
           display: true,
-          text: `TRANSPORT USED`,
+          text: `TRANSPORT`,
+          position: `left`,
           fontSize: 30,
+          padding: 30,
           fontColor: `#000000`
         },
-        legend: {
-          position: `left`,
-          labels: {
-            boxWidth: 26,
-            padding: 26,
-            fontStyle: 500,
-            fontColor: `#000000`,
-            fontSize: 27,
+        plugins: {
+          datalabels: {
+            display: true,
+            anchor: `end`,
+            align: `start`,
+            padding: 10,
+            formatter(value) {
+              return `${value}x`;
+            },
           }
+        },
+        scales: {
+          yAxes: [{
+            barPercentage: 1.1,
+            gridLines: {
+              display: false,
+              drawBorder: false
+            }
+          }],
+          xAxes: [{
+            minBarLength: 50,
+            ticks: {
+              display: false,
+              beginAtZero: true
+            },
+            gridLines: {
+              display: false,
+              drawBorder: false
+            }
+          }]
+        },
+        legend: {
+          display: false,
+        },
+        layout: {
+          paddingTop: 10
+        },
+        tooltips: {
+          enabled: true
         }
       },
     });
+    const destinations = [...new Set(this._waypoints.map((it) => {
+      return it.city;
+    }))];
     const timeChart = new Chart(timeCtx, {
-      type: `pie`,
+      type: `horizontalBar`,
+      plugins: [ChartDataLabels],
       data: {
-        labels: waypointTypeNames.filter((name) => {
-          return this._waypoints.some((it) => {
-            return it.type === waypointType[name];
-          });
-        }),
+        labels: destinations,
         datasets: [{
-          data: waypointTypeNames.map((name) => {
+          data: destinations.map((name, index) => {
+            let sum = 0;
+
+            this._waypoints.forEach((it) => {
+              if (it.city === destinations[index]) {
+                sum += it.time.endTime - it.time.startTime;
+              }
+            });
+
+            return sum;
+          }),
+          data1: waypointTypeNames.map((name) => {
             let sum = 0;
 
             this._waypoints.forEach((it) => {
@@ -375,50 +405,57 @@ class TripController {
 
             return sum;
           }).filter((result) => result !== 0),
-          backgroundColor: [...colors]
+          backgroundColor: `#ffffff`,
         }]
       },
       options: {
-        plugins: {
-          datalabels: {
-            display: false
-          }
-        },
-        tooltips: {
-          callbacks: {
-            label: (tooltipItem, data) => {
-              const allData = data.datasets[tooltipItem.datasetIndex].data;
-              const tooltipData = allData[tooltipItem.index];
-              const total = allData.reduce((acc, it) => acc + parseFloat(it));
-              const tooltipPercentage = Math.round((tooltipData / total) * 100);
-
-              return `SPENT ${moment.duration(tooltipData).days()} day(s) ${moment.duration(tooltipData).hours()} hour(s) ${moment.duration(tooltipData).minutes()} minute(s) — ${tooltipPercentage}%`;
-            }
-          },
-          displayColors: false,
-          backgroundColor: `#ffffff`,
-          bodyFontColor: `#000000`,
-          borderColor: `#000000`,
-          borderWidth: 1,
-          cornerRadius: 0,
-          xPadding: 15,
-          yPadding: 15
-        },
         title: {
           display: true,
           text: `TIME SPENT`,
+          position: `left`,
           fontSize: 30,
+          padding: 30,
           fontColor: `#000000`
         },
-        legend: {
-          position: `left`,
-          labels: {
-            boxWidth: 26,
-            padding: 26,
-            fontStyle: 500,
-            fontColor: `#000000`,
-            fontSize: 27,
+        plugins: {
+          datalabels: {
+            display: true,
+            anchor: `end`,
+            align: `start`,
+            padding: 10,
+            formatter(value) {
+              return `${parseInt(value / MSECONDS_IN_SECOND / SECONDS_IN_MINUTE / MINUTES_IN_HOUR, 10)}H`;
+            },
           }
+        },
+        scales: {
+          yAxes: [{
+            barPercentage: 1.1,
+            gridLines: {
+              display: false,
+              drawBorder: false
+            }
+          }],
+          xAxes: [{
+            minBarLength: 50,
+            ticks: {
+              display: false,
+              beginAtZero: true
+            },
+            gridLines: {
+              display: false,
+              drawBorder: false
+            }
+          }]
+        },
+        legend: {
+          display: false,
+        },
+        layout: {
+          paddingTop: 10
+        },
+        tooltips: {
+          enabled: true,
         }
       },
     });
