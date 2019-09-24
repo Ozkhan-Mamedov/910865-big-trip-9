@@ -1,3 +1,5 @@
+import {getTargetMonth} from "./components/trip-info";
+
 const Position = {
   AFTERBEGIN: `afterbegin`,
   BEFOREEND: `beforeend`
@@ -50,10 +52,64 @@ const unrenderComponent = (element) => {
   }
 };
 
+/**
+ * @param { [ { offers: Set < {} >,
+ *             city: string,
+ *             description: string,
+ *             time: {
+ *               duration: {
+ *                 days: number,
+ *                 hours: number,
+ *                 minutes: number
+ *               },
+ *               endTime: number,
+ *               startTime: number
+ *             },
+ *             type: {
+ *               address: string,
+ *               template: string
+ *             },
+ *             waypointPrice: number,
+ *             photos: [string] } ] } waypoints
+ * @return { [ {
+ *   tripDay: number,
+ *   day: number,
+ *   month: string,
+ *   dayCode: number
+ *        } ] }
+ */
+const getDaysData = (waypoints) => {
+  let dates = [];
+
+  if (waypoints.length) {
+    let currentTripDay = 1;
+    let oldStateDate = new Date(waypoints[0].time.startTime).getDate();
+    let oldStateMonth = new Date(waypoints[0].time.startTime).getMonth();
+
+    waypoints.forEach((it) => {
+      if ((new Date(it.time.startTime).getDate() !== oldStateDate) || (new Date(it.time.startTime).getMonth() !== oldStateMonth)) {
+        currentTripDay++;
+      }
+
+      dates.push({
+        tripDay: currentTripDay,
+        day: new Date(it.time.startTime).getDate(),
+        month: getTargetMonth(new Date(it.time.startTime).getMonth()),
+        dayCode: it.time.startTime
+      });
+      oldStateDate = new Date(it.time.startTime).getDate();
+      oldStateMonth = new Date(it.time.startTime).getMonth();
+    });
+  }
+
+  return dates;
+};
+
 export {
   Position,
   getRandomNumber,
   createElement,
   renderComponent,
-  unrenderComponent
+  unrenderComponent,
+  getDaysData
 };

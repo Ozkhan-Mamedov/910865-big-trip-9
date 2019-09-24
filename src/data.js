@@ -188,5 +188,6 @@ export {
   cities,
   menus,
   filters,
-  sortedWaypoints
+  sortedWaypoints,
+  getSortedByDateList
 };

@@ -30,7 +30,7 @@ const getOffersStatus = (arr, name) => {
 
   switch (name) {
     case `luggage`:
-      elem = arr.slice().filter((it) => it.id === `luggage`)[0];
+      elem = arr.filter((it) => it.id === `luggage`)[0];
 
       if (elem) {
         isSelected = elem.isSelected;
@@ -38,7 +38,7 @@ const getOffersStatus = (arr, name) => {
       break;
 
     case `comfort`:
-      elem = arr.slice().filter((it) => it.id === `comfort`)[0];
+      elem = arr.filter((it) => it.id === `comfort`)[0];
 
       if (elem) {
         isSelected = elem.isSelected;
@@ -46,7 +46,7 @@ const getOffersStatus = (arr, name) => {
       break;
 
     case `meal`:
-      elem = arr.slice().filter((it) => it.id === `meal`)[0];
+      elem = arr.filter((it) => it.id === `meal`)[0];
 
       if (elem) {
         isSelected = elem.isSelected;
@@ -54,7 +54,7 @@ const getOffersStatus = (arr, name) => {
       break;
 
     case `seats`:
-      elem = arr.slice().filter((it) => it.id === `seats`)[0];
+      elem = arr.filter((it) => it.id === `seats`)[0];
 
       if (elem) {
         isSelected = elem.isSelected;
@@ -62,7 +62,7 @@ const getOffersStatus = (arr, name) => {
       break;
 
     case `train`:
-      elem = arr.slice().filter((it) => it.id === `train`)[0];
+      elem = arr.filter((it) => it.id === `train`)[0];
 
       if (elem) {
         isSelected = elem.isSelected;
@@ -75,7 +75,7 @@ const getOffersStatus = (arr, name) => {
 
 class CardEdit extends AbstractComponent {
   /**
-   * @params { { offers: Set < {} >,
+   * @param { { offers: Set < {} >,
    *             city: string,
    *             description: string,
    *             time: {
@@ -92,7 +92,8 @@ class CardEdit extends AbstractComponent {
    *               template: string
    *             },
    *             waypointPrice: number,
-   *             photos: [string] }  }
+   *             photos: [string] }  },
+   *
    */
   constructor({type, city, waypointPrice, time, description, photos, offers}) {
     super();
@@ -110,7 +111,7 @@ class CardEdit extends AbstractComponent {
    */
   getTemplate() {
     return `
-      <form class="event  event--edit" action="#" method="post">
+      <form class="trip-events__item event  event--edit" action="#" method="post">
         <header class="event__header">
           <div class="event__type-wrapper">
             <label class="event__type  event__type-btn" for="event-type-toggle-1">
@@ -210,20 +211,24 @@ class CardEdit extends AbstractComponent {
             <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${this._waypointPrice}">
           </div>
   
-          <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-          <button class="event__reset-btn" type="reset">Delete</button>
+          <button class="event__save-btn  btn  btn--blue" type="button">Save</button>
+          <button class="event__reset-btn" type="reset">${this._description ? `Delete` : `Cancel`}</button>
   
           <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" checked="">
+          ${this._description ?
+    `
           <label class="event__favorite-btn" for="event-favorite-1">
             <span class="visually-hidden">Add to favorite</span>
             <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
               <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"></path>
             </svg>
           </label>
-  
+          
           <button class="event__rollup-btn" type="button">
             <span class="visually-hidden">Open event</span>
           </button>
+    ` : ``}
+  
         </header>
   
         <section class="event__details">
@@ -279,16 +284,18 @@ class CardEdit extends AbstractComponent {
             </div>
           </section>
   
-          <section class="event__section  event__section--destination">
-            <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-            <p class="event__destination-description">${this._description}</p>
-  
-            <div class="event__photos-container">
-              <div class="event__photos-tape">
-              ${this._photos.map((it, index)=> index < this._photos.length ? `<img class="event__photo" src="${it}" alt="Event photo">` : ``).join(``)}
-              </div>
-            </div>
-          </section>
+          ${this._description ?
+    `<section class="event__section  event__section--destination">
+      <h3 class="event__section-title  event__section-title--destination">Destination</h3>
+      <p class="event__destination-description">${this._description}</p>
+
+      <div class="event__photos-container">
+        <div class="event__photos-tape">
+        ${this._photos.map((it, index)=> index < this._photos.length ? `<img class="event__photo" src="${it}" alt="Event photo">` : ``).join(``)}
+        </div>
+      </div>
+    </section>`
+    : ``}
         </section>
       </form>
     `;

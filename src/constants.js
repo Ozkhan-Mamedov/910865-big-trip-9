@@ -49,6 +49,15 @@ const waypointTypeNames = [
   `train`,
   `transport`
 ];
+const waypointTransportTypeNames = [
+  `bus`,
+  `car`,
+  `plane`,
+  `ship`,
+  `taxi`,
+  `train`,
+  `transport`
+];
 const waypointType = {
   'bus': {
     address: `bus.png`,
@@ -127,6 +136,7 @@ const TripControllerMode = {
   ADDING: `adding`,
   DEFAULT: `default`
 };
+
 export {
   MIN_SENTENCE_NUMBER,
   MAX_SENTENCE_NUMBER,
@@ -149,5 +159,6 @@ export {
   waypointTypeNames,
   additionalOffers,
   cities,
-  TripControllerMode
+  TripControllerMode,
+  waypointTransportTypeNames
 };
