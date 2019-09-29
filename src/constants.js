@@ -2,8 +2,6 @@ const MIN_SENTENCE_NUMBER = 1;
 const MAX_SENTENCE_NUMBER = 3;
 const MAX_PHOTOS_NUMBER = 8;
 const WAYPOINTS_NUMBER = 9;
-const MONTHS_IN_YEAR = 12;
-const DAYS_IN_MONTH = 31;
 const DAYS_IN_WEEK = 7;
 const HOURS_IN_DAY = 24;
 const MINUTES_IN_HOUR = 60;
@@ -39,20 +37,20 @@ const cities = [
 ];
 const waypointTypeNames = [
   `bus`,
-  `hotel`,
-  `car`,
-  `plane`,
+  `check-in`,
+  `drive`,
+  `flight`,
   `restaurant`,
   `ship`,
-  `sight`,
+  `sightseeing`,
   `taxi`,
   `train`,
   `transport`
 ];
 const waypointTransportTypeNames = [
   `bus`,
-  `car`,
-  `plane`,
+  `drive`,
+  `flight`,
   `ship`,
   `taxi`,
   `train`,
@@ -63,15 +61,15 @@ const waypointType = {
     address: `bus.png`,
     template: `Bus to`,
   },
-  'hotel': {
+  'check-in': {
     address: `check-in.png`,
     template: `Check in`,
   },
-  'car': {
+  'drive': {
     address: `drive.png`,
     template: `Drive to`,
   },
-  'plane': {
+  'flight': {
     address: `flight.png`,
     template: `Flight to`,
   },
@@ -83,7 +81,7 @@ const waypointType = {
     address: `ship.png`,
     template: `Ship to`,
   },
-  'sight': {
+  'sightseeing': {
     address: `sightseeing.png`,
     template: `Sightseeing at`,
   },
@@ -100,6 +98,108 @@ const waypointType = {
     template: `Transport to`,
   },
 };
+const offersData = [
+  {
+    id: `radio`,
+    name: `Choose the radio station`
+  },
+  {
+    id: `temperature`,
+    name: `Choose temperature`
+  },
+  {
+    id: `drive-quickly`,
+    name: `Drive quickly, I'm in a hurry`
+  },
+  {
+    id: `drive-slowly`,
+    name: `Drive slowly`
+  },
+  {
+    id: `infotainment-system`,
+    name: `Infotainment system`
+  },
+  {
+    id: `order-meal`,
+    name: `Order meal`
+  },
+  {
+    id: `seats`,
+    name: `Choose seats`
+  },
+  {
+    id: `book-taxi`,
+    name: `Book a taxi at the arrival point`
+  },
+  {
+    id: `order-breakfast`,
+    name: `Order a breakfast`
+  },
+  {
+    id: `wake-at-certain-time`,
+    name: `Wake up at a certain time`
+  },
+  {
+    id: `meal`,
+    name: `Choose meal`
+  },
+  {
+    id: `upgrade-to-comfort-class`,
+    name: `Upgrade to comfort class`
+  },
+  {
+    id: `upgrade-to-business-class`,
+    name: `Upgrade to business class`
+  },
+  {
+    id: `upgrade-to-business-class`,
+    name: `Upgrade to a business class`
+  },
+  {
+    id: `add-luggage`,
+    name: `Add luggage`
+  },
+  {
+    id: `business-lounge`,
+    name: `Business lounge`
+  },
+  {
+    id: `check-in-time`,
+    name: `Choose the time of check-in`
+  },
+  {
+    id: `check-out-time`,
+    name: `Choose the time of check-out`
+  },
+  {
+    id: `add-breakfast`,
+    name: `Add breakfast`
+  },
+  {
+    id: `laundry`,
+    name: `Laundry`
+  },
+  {
+    id: `order-meal-from-restaurant`,
+    name: `Order a meal from the restaurant`
+  },
+  {
+    id: `comfort-class`,
+    name: `Choose comfort class`
+  },
+  {
+    id: `business-class`,
+    name: `Choose business class`
+  },
+  {
+    id: `live-music`,
+    name: `Choose live music`
+  },
+  {
+    id: `vip-area`,
+    name: `Choose VIP area`
+  },
+];
 const additionalOffers = [
   {
     id: `luggage`,
@@ -142,8 +242,6 @@ export {
   MAX_SENTENCE_NUMBER,
   MAX_PHOTOS_NUMBER,
   WAYPOINTS_NUMBER,
-  MONTHS_IN_YEAR,
-  DAYS_IN_MONTH,
   DAYS_IN_WEEK,
   HOURS_IN_DAY,
   MINUTES_IN_HOUR,
@@ -160,5 +258,6 @@ export {
   additionalOffers,
   cities,
   TripControllerMode,
-  waypointTransportTypeNames
+  waypointTransportTypeNames,
+  offersData
 };

@@ -28,7 +28,8 @@ class PointController {
    *               template: string
    *             },
    *             waypointPrice: number,
-   *             photos: [string] } } data
+   *             photos: [string],
+   *             isFavorite: boolean } } data
    * @param { {
    *    ADDING: string,
    *    DEFAULT: string
@@ -36,13 +37,13 @@ class PointController {
    * @param {function} onDataChange
    * @param {function} onChangeView
    */
-  constructor(container, data, mode, onDataChange, onChangeView) {
+  constructor(container, data, mode, onDataChange, onChangeView, cityDescriptionData, tripTypeOffers) {
     this._container = container;
     this._data = data;
     this._onDataChange = onDataChange;
     this._onChangeView = onChangeView;
     this._cardComponent = new Card(data).getElement();
-    this._cardEditComponent = new CardEdit(data).getElement();
+    this._cardEditComponent = new CardEdit(data, cityDescriptionData, tripTypeOffers).getElement();
 
     this.init(mode);
   }
@@ -109,13 +110,32 @@ class PointController {
           endTime: moment(formData.get(`event-end-time`), `DD/MM/YYYY hh:mm`).valueOf(),
           startTime: moment(formData.get(`event-start-time`), `DD/MM/YYYY hh:mm`).valueOf()
         },
-        offers: getOfferData(formData.getAll(`event-offer`)),
+        offers: [...this._cardEditComponent.querySelectorAll(`.event__offer-checkbox`)].map((it) => {
+          return {
+            price: parseInt(it.labels[0].lastElementChild.textContent, 10),
+            title: it.labels[0].firstElementChild.textContent,
+          };
+        }),
+        isFavorite: !!formData.get(`event-favorite`),
+        id: this._data.id.toString(),
+        description: this._cardEditComponent.querySelector(`.event__destination-description`).textContent,
+        photos: [...this._cardEditComponent.querySelectorAll(`.event__photo`)].map((it) => {
+          return {
+            src: it.src,
+            description: it.alt,
+          };
+        }),
       };
+      console.log(entry);
 
-      if (mode === TripControllerMode.DEFAULT) {
-        entry.description = this._cardEditComponent.querySelector(`.event__destination-description`).textContent;
+      /*if (mode === TripControllerMode.ADDING) {
+        entry.description = ``;
+        entry.photos = ``;
+      }*/
+      /*if (mode === TripControllerMode.DEFAULT) {
+        entry.description = parseInt(this._cardEditComponent.querySelector(`.event__destination-description`).textContent, 10);
         entry.photos = Array.from(this._cardEditComponent.querySelectorAll(`.event__photo`)).map((it) => it.src);
-      }
+      }*/
       this._onDataChange(entry, mode === TripControllerMode.ADDING ? null : this._data);
       onRollbackButtonClick();
       this._cardEditComponent.querySelector(`.event--edit`).removeEventListener(`click`, onFormSubmit);
@@ -129,16 +149,71 @@ class PointController {
       currentView.querySelector(`.event__save-btn`).addEventListener(`click`, onFormSubmit);
     }
     this._cardEditComponent.querySelector(`.event__type-toggle`).addEventListener(`click`, () => {
-      this._cardEditComponent.querySelector(`.event__type-list`).addEventListener(`click`, handler);
+      this._cardEditComponent.querySelector(`.event__type-list`).addEventListener(`click`, onListElementClick);
     });
 
     /**
      * @param {MouseEvent} clickEvt
      */
-    const handler = (clickEvt) => {
+    const onListElementClick = (clickEvt) => {
       if (clickEvt.target.tagName === `INPUT`) {
         this._cardEditComponent.querySelector(`.event__type-toggle`).checked = ``;
-        this._cardEditComponent.querySelector(`.event__type-list`).removeEventListener(`click`, handler);
+        this._cardEditComponent.querySelector(`.event__type-list`).addEventListener(`click`, (evt) => {
+          if (evt.target.tagName === `INPUT`) {
+            switch (evt.target.value) {
+              case `taxi`:
+                this._cardEditComponent.querySelector(`.event__type-icon`).src = `img/icons/taxi.png`;
+                this._cardEditComponent.querySelector(`.event__type-output`).textContent = waypointType[`taxi`].template;
+                break;
+
+              case `bus`:
+                this._cardEditComponent.querySelector(`.event__type-icon`).src = `img/icons/bus.png`;
+                this._cardEditComponent.querySelector(`.event__type-output`).textContent = waypointType[`bus`].template;
+                break;
+
+              case `train`:
+                this._cardEditComponent.querySelector(`.event__type-icon`).src = `img/icons/train.png`;
+                this._cardEditComponent.querySelector(`.event__type-output`).textContent = waypointType[`train`].template;
+                break;
+
+              case `ship`:
+                this._cardEditComponent.querySelector(`.event__type-icon`).src = `img/icons/ship.png`;
+                this._cardEditComponent.querySelector(`.event__type-output`).textContent = waypointType[`ship`].template;
+                break;
+
+              case `transport`:
+                this._cardEditComponent.querySelector(`.event__type-icon`).src = `img/icons/transport.png`;
+                this._cardEditComponent.querySelector(`.event__type-output`).textContent = waypointType[`transport`].template;
+                break;
+
+              case `drive`:
+                this._cardEditComponent.querySelector(`.event__type-icon`).src = `img/icons/drive.png`;
+                this._cardEditComponent.querySelector(`.event__type-output`).textContent = waypointType[`drive`].template;
+                break;
+
+              case `flight`:
+                this._cardEditComponent.querySelector(`.event__type-icon`).src = `img/icons/flight.png`;
+                this._cardEditComponent.querySelector(`.event__type-output`).textContent = waypointType[`flight`].template;
+                break;
+
+              case `check-in`:
+                this._cardEditComponent.querySelector(`.event__type-icon`).src = `img/icons/check-in.png`;
+                this._cardEditComponent.querySelector(`.event__type-output`).textContent = waypointType[`check-in`].template;
+                break;
+
+              case `sightseeing`:
+                this._cardEditComponent.querySelector(`.event__type-icon`).src = `img/icons/sightseeing.png`;
+                this._cardEditComponent.querySelector(`.event__type-output`).textContent = waypointType[`sightseeing`].template;
+                break;
+
+              case `restaurant`:
+                this._cardEditComponent.querySelector(`.event__type-icon`).src = `img/icons/restaurant.png`;
+                this._cardEditComponent.querySelector(`.event__type-output`).textContent = waypointType[`restaurant`].template;
+                break;
+            }
+          }
+        });
+        this._cardEditComponent.querySelector(`.event__type-list`).removeEventListener(`click`, onListElementClick);
       }
     };
 
@@ -147,7 +222,7 @@ class PointController {
     };
 
     flatpickr(this._cardEditComponent
-      .querySelectorAll(`.event__input--time`),
+        .querySelectorAll(`.event__input--time`),
     {
       dateFormat: `d/m/y H:i`,
       enableTime: true,
@@ -163,23 +238,23 @@ class PointController {
         // Интересный факт. Eсли убрать комментарий, то ошибка срабатывает 1 раз
         // после чего обработчик удаляется
         // document.removeEventListener(`keydown`, onEscKeyDown);
-        this._cardEditComponent.parentNode.replaceChild(this._cardComponent, this._cardEditComponent);
+        this._cardEditComponent.parentNode.replaceChild(currentView, this._cardEditComponent);
         document.removeEventListener(`keydown`, onEscKeyDown);
       }
     };
 
     const onRollbackButtonClick = () => {
-      this._cardEditComponent.parentNode.replaceChild(this._cardComponent, this._cardEditComponent);
+      this._cardEditComponent.parentNode.replaceChild(currentView, this._cardEditComponent);
       this._cardEditComponent.removeEventListener(`click`, onRollbackButtonClick);
       this._cardEditComponent.querySelector(`.event__reset-btn`).removeEventListener(`click`, onDeleteButtonClick);
     };
 
     const onRollupButtonClick = () => {
       this._onChangeView();
-      this._cardComponent.parentNode.replaceChild(this._cardEditComponent, this._cardComponent);
+      currentView.parentNode.replaceChild(this._cardEditComponent, currentView);
       this._cardEditComponent.querySelector(`.event__reset-btn`).addEventListener(`click`, onDeleteButtonClick);
       this._cardEditComponent.querySelector(`.event__rollup-btn`).addEventListener(`click`, onRollbackButtonClick);
-      this._cardComponent.removeEventListener(`click`, onRollupButtonClick);
+      currentView.removeEventListener(`click`, onRollupButtonClick);
       this._cardEditComponent.querySelector(`.event__type-list`).addEventListener(`click`, (evt) => {
         if (evt.target.tagName === `INPUT`) {
           switch (evt.target.value) {
@@ -210,22 +285,22 @@ class PointController {
 
             case `drive`:
               this._cardEditComponent.querySelector(`.event__type-icon`).src = `img/icons/drive.png`;
-              this._cardEditComponent.querySelector(`.event__type-output`).textContent = waypointType[`car`].template;
+              this._cardEditComponent.querySelector(`.event__type-output`).textContent = waypointType[`drive`].template;
               break;
 
             case `flight`:
               this._cardEditComponent.querySelector(`.event__type-icon`).src = `img/icons/flight.png`;
-              this._cardEditComponent.querySelector(`.event__type-output`).textContent = waypointType[`plane`].template;
+              this._cardEditComponent.querySelector(`.event__type-output`).textContent = waypointType[`flight`].template;
               break;
 
             case `check-in`:
               this._cardEditComponent.querySelector(`.event__type-icon`).src = `img/icons/check-in.png`;
-              this._cardEditComponent.querySelector(`.event__type-output`).textContent = waypointType[`hotel`].template;
+              this._cardEditComponent.querySelector(`.event__type-output`).textContent = waypointType[`check-in`].template;
               break;
 
             case `sightseeing`:
               this._cardEditComponent.querySelector(`.event__type-icon`).src = `img/icons/sightseeing.png`;
-              this._cardEditComponent.querySelector(`.event__type-output`).textContent = waypointType[`sight`].template;
+              this._cardEditComponent.querySelector(`.event__type-output`).textContent = waypointType[`sightseeing`].template;
               break;
 
             case `restaurant`:
@@ -240,7 +315,7 @@ class PointController {
     };
 
     renderComponent(this._container, currentView, renderPosition);
-    this._cardComponent.querySelector(`.event__rollup-btn`).addEventListener(`click`, onRollupButtonClick);
+    currentView.querySelector(`.event__rollup-btn`).addEventListener(`click`, onRollupButtonClick);
   }
 }
 

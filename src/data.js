@@ -132,7 +132,8 @@ const getTime = () => {
  *               template: string
  *             },
  *             waypointPrice: number,
- *             photos: [string] } }
+ *             photos: [string],
+ *             isFavorite: boolean } }
  */
 const getWaypoint = () => ({
   type: getRandomType(),
@@ -142,6 +143,7 @@ const getWaypoint = () => ({
   description: getWaypointDescription(description),
   photos: getWaypointPhotos(),
   offers: getOffers(),
+  isFavorite: Math.random() >= 0.5
 });
 
 /**
@@ -182,12 +184,9 @@ for (let i = 0; i < WAYPOINTS_NUMBER; i++) {
   waypoints[i] = getWaypoint();
 }
 
-const sortedWaypoints = waypoints.slice().sort(getSortedByDateList);
-
 export {
   cities,
   menus,
   filters,
-  sortedWaypoints,
   getSortedByDateList
 };
