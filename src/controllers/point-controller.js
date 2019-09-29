@@ -114,6 +114,7 @@ class PointController {
           return {
             price: parseInt(it.labels[0].lastElementChild.textContent, 10),
             title: it.labels[0].firstElementChild.textContent,
+            isSelected: it.checked
           };
         }),
         isFavorite: !!formData.get(`event-favorite`),
