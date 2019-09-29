@@ -99,7 +99,7 @@ const generatePageElements = () => {
   const presetFilteredPage = (filteredWaypoints) => {
     tripDaysData = getDaysData(filteredWaypoints);
     tripController.unrenderTripBoard();
-    tripController = new TripController(mainContainer, filteredWaypoints, tripDaysData, tripCityDescriptions, tripTypeOffers);
+    tripController = new TripController(mainContainer, filteredWaypoints, tripDaysData, tripCityDescriptions, tripTypeOffers, onDataChange);
     tripController.init();
     tripController._hideStatistics();
     controlsContainer.querySelector(`.trip-tabs`).children[1].classList.remove(`trip-tabs__btn--active`);
