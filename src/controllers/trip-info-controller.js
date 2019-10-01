@@ -18,19 +18,26 @@ class TripInfoController {
         routePoints.add(it.city);
       });
       routeDates.startTime = this._waypoints[0].time.startTime;
-      routeDates.endTime = this._waypoints[this._waypoints.length - 1].time.startTime;
+      routeDates.endTime = this._waypoints[this._waypoints.length - 1].time.endTime;
     }
 
     tripCostValue.textContent = this._getTripCostValue(waypoints);
-    if (this._waypoints.length) {
+    if (this._waypoints.length > 2) {
       tripTitle.textContent = `${this._waypoints[0].city} — ${(routePoints.size <= 3) ? `${Array.from(routePoints)[1]}` : `...`} — ${this._waypoints[this._waypoints.length - 1].city}`;
       tripDates.textContent = `${getTargetMonth(new Date(routeDates.startTime).getMonth())} ${new Date(routeDates.startTime).getDate()} — ${(getTargetMonth(new Date(routeDates.startTime).getMonth()) !== getTargetMonth(new Date(routeDates.endTime).getMonth())) ? getTargetMonth(new Date(routeDates.endTime).getMonth()) : ``} ${new Date(routeDates.endTime).getDate()}`;
-    } else {
+    }
+    if (this._waypoints.length === 0) {
       tripTitle.textContent = ``;
       tripDates.textContent = ``;
     }
-    /*tripTitle.textContent = `${this._waypoints[0].city} — ${(routePoints.size <= 3) ? `${Array.from(routePoints)[1]}` : `...`} — ${this._waypoints[this._waypoints.length - 1].city}`;
-    tripDates.textContent = `${getTargetMonth(new Date(routeDates.startTime).getMonth())} ${new Date(routeDates.startTime).getDate()} — ${(getTargetMonth(new Date(routeDates.startTime).getMonth()) !== getTargetMonth(new Date(routeDates.endTime).getMonth())) ? getTargetMonth(new Date(routeDates.endTime).getMonth()) : ``} ${new Date(routeDates.endTime).getDate()}`;*/
+    if (this._waypoints.length === 1) {
+      tripTitle.textContent = `${this._waypoints[0].city}`;
+      tripDates.textContent = `${getTargetMonth(new Date(routeDates.startTime).getMonth())} ${new Date(routeDates.startTime).getDate()} — ${(getTargetMonth(new Date(routeDates.startTime).getMonth()) !== getTargetMonth(new Date(routeDates.endTime).getMonth())) ? getTargetMonth(new Date(routeDates.endTime).getMonth()) : ``} ${new Date(routeDates.endTime).getDate()}`;
+    }
+    if (this._waypoints.length === 2) {
+      tripTitle.textContent = `${this._waypoints[0].city} — ${this._waypoints[1].city}`;
+      tripDates.textContent = `${getTargetMonth(new Date(routeDates.startTime).getMonth())} ${new Date(routeDates.startTime).getDate()} — ${(getTargetMonth(new Date(routeDates.startTime).getMonth()) !== getTargetMonth(new Date(routeDates.endTime).getMonth())) ? getTargetMonth(new Date(routeDates.endTime).getMonth()) : ``} ${new Date(routeDates.endTime).getDate()}`;
+    }
   }
 
   /**
