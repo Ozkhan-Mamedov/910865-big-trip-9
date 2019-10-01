@@ -9,6 +9,8 @@ import {cities, TripControllerMode, waypointType, waypointTypeNames,
   MSECONDS_IN_SECOND, SECONDS_IN_MINUTE, MINUTES_IN_HOUR, waypointTransportTypeNames} from "../constants";
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import TripInfoController from "./trip-info-controller";
+import NoPoints from "../components/no-points";
 
 class TripController {
   /**
@@ -23,15 +25,19 @@ class TripController {
    *   dayCode: number
    *        } ] } tripDaysData
    */
-  constructor(container, waypoints, tripDaysData) {
+  constructor(container, waypoints, tripDaysData, cityDescriptionData, tripTypeOffers, onDataChange) {
     this._container = container;
     this._waypoints = waypoints;
     this._tripDaysData = tripDaysData;
     this._eventContainerIndex = 0;
     this._board = new CardBoard();
     this._sort = new Sort();
+    this._onDataChangeMain = onDataChange;
+    this._tripInfoController = new TripInfoController(this._waypoints);
     this._dayElement = new Day(tripDaysData).getElement();
     this._subscriptions = [];
+    this._cityDescriptionData = cityDescriptionData;
+    this._tripTypeOffers = tripTypeOffers;
     this._creatingWaypoint = null;
     this._onDataChange = this._onDataChange.bind(this);
     this._onChangeView = this._onChangeView.bind(this);
@@ -50,6 +56,7 @@ class TripController {
 
       this._renderTripWaypoint(it, this._eventContainerIndex);
     });
+    this._tripInfoController.updateTripInfo(this._waypoints);
 
     this._sort.getElement().querySelector(`.trip-sort`).addEventListener(`click`, (evt) => this._onSortElementClick(evt));
   }
@@ -66,7 +73,7 @@ class TripController {
    * @private
    */
   _renderTripWaypoint(tripWaypoint, containerIndex) {
-    const pointController = new PointController(this._dayElement.querySelectorAll(`.trip-events__list`)[containerIndex], tripWaypoint, TripControllerMode.DEFAULT, this._onDataChange, this._onChangeView);
+    const pointController = new PointController(this._dayElement.querySelectorAll(`.trip-events__list`)[containerIndex], tripWaypoint, TripControllerMode.DEFAULT, this._onDataChange, this._onChangeView, this._cityDescriptionData, this._tripTypeOffers);
 
     this._subscriptions.push(pointController.setDefaultView.bind(pointController));
   }
@@ -78,16 +85,25 @@ class TripController {
 
     const defaultWaypoint = {
       type: waypointType[waypointTypeNames[getRandomNumber(0, waypointTypeNames.length - 1)]],
-      city: cities[getRandomNumber(0, cities.length - 1)],
+      city: this._cityDescriptionData.map((it) => it.name)[getRandomNumber(0, cities.length - 1)],
       waypointPrice: 0,
       time: {
         startTime: new Date(),
         endTime: new Date(),
       },
-      offers: new Set(),
+      isFavorite: false,
+      id: this._waypoints.length,
     };
+    defaultWaypoint.photos = this._cityDescriptionData.find((it) => it.name === defaultWaypoint.city).pictures;
+    defaultWaypoint.description = this._cityDescriptionData.find((it) => it.name === defaultWaypoint.city).description;
 
-    this._creatingWaypoint = new PointController(this._board.getElement().firstElementChild, defaultWaypoint, TripControllerMode.ADDING, this._onDataChange, this._onChangeView);
+    const offerKey = Object.keys(waypointType).find((it) => waypointType[it] === defaultWaypoint.type);
+
+    defaultWaypoint.offers = this._tripTypeOffers.find((it) => it.type === offerKey).offers;
+    this._creatingWaypoint = new PointController(this._board.getElement().firstElementChild, defaultWaypoint, TripControllerMode.ADDING, this._onDataChange, this._onChangeView, this._cityDescriptionData, this._tripTypeOffers);
+  }
+
+  _setNewWaypointStatus() {
     this._creatingWaypoint = null;
   }
 
@@ -109,7 +125,8 @@ class TripController {
    *               template: string
    *             },
    *             waypointPrice: number,
-   *             photos: [string] } } newData
+   *             photos: [string],
+   *             isFavorite: boolean } } newData
    * @param { { offers: Set < {} >,
    *             city: string,
    *             description: string,
@@ -127,20 +144,31 @@ class TripController {
    *               template: string
    *             },
    *             waypointPrice: number,
-   *             photos: [string] } } oldData
+   *             photos: [string],
+   *             isFavorite: boolean } } oldData
    * @private
    */
   _onDataChange(newData, oldData) {
     if (oldData !== null && newData !== null) {
       this._waypoints[this._waypoints.findIndex((it) => it === oldData)] = newData;
+      this._onDataChangeMain(`update`, this._waypoints[this._waypoints.findIndex((it) => it === newData)]);
     }
     if (newData === null) {
-      this._waypoints.splice(this._waypoints.findIndex((it) => it === newData), 1);
+      this._onDataChangeMain(`delete`, this._waypoints[this._waypoints.findIndex((it) => it === oldData)]);
+      // this._onDataChangeMain(`delete`, this._waypoints.findIndex((it) => it === oldData));
+      this._waypoints.splice(this._waypoints.findIndex((it) => it === oldData), 1);
+      this._tripDaysData = getDaysData(this._waypoints);
+      if (this._waypoints.length === 0) {
+        renderComponent(this._container, new NoPoints().getElement(), Position.BEFOREEND);
+        unrenderComponent(this._sort.getElement());
+      }
     }
     if (oldData === null) {
+      this._onDataChangeMain(`create`, newData);
       this._waypoints.unshift(newData);
       this._waypoints.sort(getSortedByDateList);
       this._tripDaysData = getDaysData(this._waypoints);
+      this._creatingWaypoint = null;
     }
     unrenderComponent(this._board.getElement());
     this._board = new CardBoard();
@@ -154,6 +182,7 @@ class TripController {
       }
       this._renderTripWaypoint(it, this._eventContainerIndex);
     });
+    this._tripInfoController.updateTripInfo(this._waypoints);
   }
 
   _onChangeView() {
