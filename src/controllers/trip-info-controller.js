@@ -64,15 +64,14 @@ class TripInfoController {
    */
   _getTripCostValue(waypoints) {
     let sum = 0;
-    const mainContainer = document.querySelector(`.trip-events`);
-    const additionalOffersPrice = mainContainer.querySelectorAll(`.event__offer-price`);
 
     waypoints.forEach((it) => {
       sum += it.waypointPrice;
-    });
-
-    additionalOffersPrice.forEach((it) => {
-      sum += parseInt(it.textContent, 10);
+      it.offers.forEach((offer) => {
+        if (offer.isSelected === true) {
+          sum += offer.price;
+        }
+      });
     });
 
     return sum;

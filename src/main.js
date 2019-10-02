@@ -17,7 +17,6 @@ const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
 let waypoints = null;
 
 const onDataChange = (actionType, update) => {
-  console.log(update);
   switch (actionType) {
     case `delete`:
       api.deleteWaypoint({
@@ -127,7 +126,6 @@ const generatePageElements = () => {
     }
   };
 
-  //renderComponent(tripInfoContainer, new TripInfo(sortedWaypoints).getElement(), Position.AFTERBEGIN); // in
   renderComponent(controlsContainer, new Menu(menus).getElement(), Position.BEFOREEND);
   renderComponent(controlsContainer, new Filters(filters).getElement(), Position.BEFOREEND);
 
@@ -146,13 +144,11 @@ const generatePageElements = () => {
     })
     .then(() => api.getWaypoints({url: `points`}))
     .then((waypointData) => {
-      //waypoints = waypointData.slice().map((it) => new ModelPoint(it));
       waypoints = ModelPoint.parseWaypoints(waypointData);
       tripDaysData = getDaysData(waypoints);
       renderComponent(tripInfoContainer, new TripInfo(waypoints).getElement(), Position.AFTERBEGIN);
       tripController = new TripController(mainContainer, waypoints, tripDaysData, tripCityDescriptions, tripTypeOffers, onDataChange);
       tripController.init();
-      //tripCostValue.textContent = `${getTripCostValue(waypoints)}`;
       tripController._hideStatistics();
       checkTasksState();
       controlsContainer.querySelector(`.trip-filters`).addEventListener(`click`, (evt) => {
@@ -198,56 +194,6 @@ const generatePageElements = () => {
 
       document.querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, onAddButtonClick);
     });
-  /*
-  let tripDaysData = getDaysData(sortedWaypoints);
-  let tripController = new TripController(mainContainer, sortedWaypoints, tripDaysData);
-
-  tripController.init();
-  //tripCostValue.textContent = `${getTripCostValue(sortedWaypoints)}`;
-  tripController._hideStatistics();
-  checkTasksState();
-  controlsContainer.querySelector(`.trip-filters`).addEventListener(`click`, (evt) => {
-    switch (evt.target.value) {
-      case `everything`:
-        presetFilteredPage(sortedWaypoints);
-        break;
-
-      case `future`:
-        const futureWaypoints = sortedWaypoints.filter((it) => it.time.startTime > Date.now());
-
-        presetFilteredPage(futureWaypoints);
-        break;
-
-      case `past`:
-        const pastWaypoints = sortedWaypoints.filter((it) => it.time.startTime < Date.now());
-
-        presetFilteredPage(pastWaypoints);
-        break;
-    }
-  });
-  controlsContainer.querySelector(`.trip-tabs`).addEventListener(`click`, (evt) => {
-    evt.preventDefault();
-
-    if (evt.target.tagName !== `A`) {
-      return;
-    }
-
-    switch (evt.target.text) {
-      case `Table`:
-        evt.currentTarget.children[1].classList.remove(`trip-tabs__btn--active`);
-        evt.target.classList.add(`trip-tabs__btn--active`);
-        tripController._hideStatistics();
-        break;
-
-      case `Stats`:
-        evt.currentTarget.children[0].classList.remove(`trip-tabs__btn--active`);
-        evt.target.classList.add(`trip-tabs__btn--active`);
-        tripController._showStatistics();
-        break;
-    }
-  });
-
-  document.querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, onAddButtonClick);*/
 };
 
 generatePageElements();

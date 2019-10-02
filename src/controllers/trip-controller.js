@@ -24,6 +24,28 @@ class TripController {
    *   month: string,
    *   dayCode: number
    *        } ] } tripDaysData
+   * @param { [{name: string, description: string, pictures: [ {src: string, description: string} ]}] } cityDescriptionData
+   * @param { [{type: string, offers: [ {name: string, title: string, price: number} ]}] } tripTypeOffers
+   * @param { {actionType: string,
+   *           update:  { offers: Set < {} >,
+   *             city: string,
+   *             description: string,
+   *             time: {
+   *               duration: {
+   *                 days: number,
+   *                 hours: number,
+   *                 minutes: number
+   *               },
+   *               endTime: number,
+   *               startTime: number
+   *             },
+   *             type: {
+   *               address: string,
+   *               template: string
+   *             },
+   *             waypointPrice: number,
+   *             photos: [string],
+   *             isFavorite: boolean } } } onDataChange
    */
   constructor(container, waypoints, tripDaysData, cityDescriptionData, tripTypeOffers, onDataChange) {
     this._container = container;
@@ -155,7 +177,6 @@ class TripController {
     }
     if (newData === null) {
       this._onDataChangeMain(`delete`, this._waypoints[this._waypoints.findIndex((it) => it === oldData)]);
-      // this._onDataChangeMain(`delete`, this._waypoints.findIndex((it) => it === oldData));
       this._waypoints.splice(this._waypoints.findIndex((it) => it === oldData), 1);
       this._tripDaysData = getDaysData(this._waypoints);
       if (this._waypoints.length === 0) {

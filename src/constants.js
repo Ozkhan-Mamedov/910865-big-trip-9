@@ -236,6 +236,7 @@ const TripControllerMode = {
   ADDING: `adding`,
   DEFAULT: `default`
 };
+const MAX_OFFER_NUMBER = 3;
 
 export {
   MIN_SENTENCE_NUMBER,
@@ -259,5 +260,6 @@ export {
   cities,
   TripControllerMode,
   waypointTransportTypeNames,
-  offersData
+  offersData,
+  MAX_OFFER_NUMBER
 };

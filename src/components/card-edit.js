@@ -2,78 +2,6 @@ import {offersData} from "../constants";
 import AbstractComponent from "./abstract-components";
 import moment from 'moment';
 
-/**
- * @param { [ { offers: Set < {} >,
- *             city: string,
- *             description: string,
- *             time: {
- *               duration: {
- *                 days: number,
- *                 hours: number,
- *                 minutes: number
- *               },
- *               endTime: number,
- *               startTime: number
- *             },
- *             type: {
- *               address: string,
- *               template: string
- *             },
- *             waypointPrice: number,
- *             photos: [string],
- *             isFavorite: boolean }] } arr
- * @param {string} name
- * @return {boolean}
- */
-const getOffersStatus = (arr, name) => {
-  let isSelected = false;
-  let elem;
-
-  switch (name) {
-    case `luggage`:
-      elem = arr.filter((it) => it.id === `luggage`)[0];
-
-      if (elem) {
-        isSelected = elem.isSelected;
-      }
-      break;
-
-    case `comfort`:
-      elem = arr.filter((it) => it.id === `comfort`)[0];
-
-      if (elem) {
-        isSelected = elem.isSelected;
-      }
-      break;
-
-    case `meal`:
-      elem = arr.filter((it) => it.id === `meal`)[0];
-
-      if (elem) {
-        isSelected = elem.isSelected;
-      }
-      break;
-
-    case `seats`:
-      elem = arr.filter((it) => it.id === `seats`)[0];
-
-      if (elem) {
-        isSelected = elem.isSelected;
-      }
-      break;
-
-    case `train`:
-      elem = arr.filter((it) => it.id === `train`)[0];
-
-      if (elem) {
-        isSelected = elem.isSelected;
-      }
-      break;
-  }
-
-  return isSelected;
-};
-
 class CardEdit extends AbstractComponent {
   /**
    * @param { { offers: Set < {} >,
@@ -96,9 +24,9 @@ class CardEdit extends AbstractComponent {
    *             photos: [string],
    *             isFavorite: boolean,
    *             id: number }  },
-   *
+   * @param { [{name: string, description: string, pictures: [ {src: string, description: string} ]}] } cityDescriptionData
    */
-  constructor({type, city, waypointPrice, time, description, photos, offers, isFavorite, id}, cityDescriptionData, tripTypeOffers) {
+  constructor({type, city, waypointPrice, time, description, photos, offers, isFavorite, id}, cityDescriptionData) {
     super();
     this._type = type;
     this._city = city;
@@ -110,7 +38,6 @@ class CardEdit extends AbstractComponent {
     this._isFavorite = isFavorite;
     this._id = id;
     this._cityDescriptionData = cityDescriptionData;
-    this._tripTypeOffers = tripTypeOffers;
   }
 
   /**
@@ -242,26 +169,25 @@ class CardEdit extends AbstractComponent {
   
         <section class="event__details">
   
-          ${this._offers.length ? `
-          <section class="event__section  event__section--offers">
-            <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-            <div class="event__available-offers">
-            
-            ${this._offers.map((it, index) => index < this._offers.length ? `
-            <div class="event__offer-selector">
-                <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offersData.find((it1) => it1.name === it.title).id}-${this._id}" type="checkbox" name="${offersData.find((it1) => it1.name === it.title).id}" ${it.isSelected ? `checked=""` : ``}>
-                <label class="event__offer-label" for="event-offer-${offersData.find((it1) => it1.name === it.title).id}-${this._id}">
-                  <span class="event__offer-title">${it.title}</span>
-                  +
-                  €&nbsp;<span class="event__offer-price">${it.price}</span>
-                </label>
-              </div>
-            ` : ``).join(``)}
-            
-          </section>
-          ` : ``}
-  
-         
+          
+        <section class="event__section  event__section--offers">
+          <h3 class="event__section-title  event__section-title--offers">Offers</h3>
+          <div class="event__available-offers">
+          
+          ${this._offers.map((it, index) => index < this._offers.length ? `
+          <div class="event__offer-selector">
+              <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offersData.find((it1) => it1.name === it.title).id}-${this._id}" type="checkbox" name="${offersData.find((it1) => it1.name === it.title).id}" ${it.isSelected ? `checked=""` : ``}>
+              <label class="event__offer-label" for="event-offer-${offersData.find((it1) => it1.name === it.title).id}-${this._id}">
+                <span class="event__offer-title">${it.title}</span>
+                +
+                €&nbsp;<span class="event__offer-price">${it.price}</span>
+              </label>
+            </div>
+          ` : ``).join(``)}
+          
+        </section>
+          
+          
     <section class="event__section  event__section--destination">
       <h3 class="event__section-title  event__section-title--destination">Destination</h3>
       <p class="event__destination-description">${this._description}</p>
