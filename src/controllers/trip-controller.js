@@ -61,6 +61,7 @@ class TripController {
     this._cityDescriptionData = cityDescriptionData;
     this._tripTypeOffers = tripTypeOffers;
     this._creatingWaypoint = null;
+    this._noPointsElement = null;
     this._onDataChange = this._onDataChange.bind(this);
     this._onChangeView = this._onChangeView.bind(this);
   }
@@ -123,6 +124,9 @@ class TripController {
 
     defaultWaypoint.offers = this._tripTypeOffers.find((it) => it.type === offerKey).offers;
     this._creatingWaypoint = new PointController(this._board.getElement().firstElementChild, defaultWaypoint, TripControllerMode.ADDING, this._onDataChange, this._onChangeView, this._cityDescriptionData, this._tripTypeOffers);
+    if (this._container.querySelector(`.trip-days`).children[1].children.length === 0) {
+      unrenderComponent(this._noPointsElement);
+    }
   }
 
   _setNewWaypointStatus() {
@@ -180,7 +184,8 @@ class TripController {
       this._waypoints.splice(this._waypoints.findIndex((it) => it === oldData), 1);
       this._tripDaysData = getDaysData(this._waypoints);
       if (this._waypoints.length === 0) {
-        renderComponent(this._container, new NoPoints().getElement(), Position.BEFOREEND);
+        this._noPointsElement = new NoPoints().getElement();
+        renderComponent(this._container, this._noPointsElement, Position.BEFOREEND);
         unrenderComponent(this._sort.getElement());
       }
     }

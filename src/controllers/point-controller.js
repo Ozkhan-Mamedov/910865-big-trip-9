@@ -278,9 +278,7 @@ class PointController {
      */
     const onEscKeyDown = (keyEvt) => {
       if (keyEvt.key === `Escape` || keyEvt.key === `Esc`) {
-        // Интересный факт. Eсли убрать комментарий, то ошибка срабатывает 1 раз
-        // после чего обработчик удаляется
-        // document.removeEventListener(`keydown`, onEscKeyDown);
+        returnUnsavedData();
         this._cardEditComponent.parentNode.replaceChild(currentView, this._cardEditComponent);
         document.removeEventListener(`keydown`, onEscKeyDown);
       }
@@ -315,6 +313,7 @@ class PointController {
       this._cardEditComponent.removeEventListener(`click`, onRollbackButtonClick);
       this._cardEditComponent.querySelector(`.event__input`).removeEventListener(`change`, onCityInputChange);
       this._cardEditComponent.querySelector(`.event__reset-btn`).removeEventListener(`click`, onDeleteButtonClick);
+      document.removeEventListener(`keydown`, onEscKeyDown);
     };
 
     const onRollupButtonClick = () => {
