@@ -70,18 +70,20 @@ class PointController {
     let renderPosition = Position.BEFOREEND;
 
     const onCityInputChange = () => {
-      const currentCity = this._cardEditComponent.querySelector(`.event__input`).value;
+      const currentCity = this._cardEditComponent.querySelector(`.event__input--destination`).value;
       const currentCityIndex = this._cityDescriptionData.findIndex((it) => it.name === currentCity);
-      const currentCityPictures = this._cityDescriptionData[currentCityIndex].pictures;
-      const cureentCityDescription = this._cityDescriptionData[currentCityIndex].description;
+      if (currentCityIndex !== -1) {
+        const currentCityPictures = this._cityDescriptionData[currentCityIndex].pictures;
+        const cureentCityDescription = this._cityDescriptionData[currentCityIndex].description;
 
-      this._cardEditComponent.querySelector(`.event__photos-tape`).innerHTML = ``;
-      currentCityPictures.forEach((it) => {
-        const pictureElement = `<img class="event__photo" src="${it.src}" alt="${it.description}">`;
+        this._cardEditComponent.querySelector(`.event__photos-tape`).innerHTML = ``;
+        currentCityPictures.forEach((it) => {
+          const pictureElement = `<img class="event__photo" src="${it.src}" alt="${it.description}">`;
 
-        this._cardEditComponent.querySelector(`.event__photos-tape`).innerHTML += pictureElement;
-      });
-      this._cardEditComponent.querySelector(`.event__destination-description`).textContent = cureentCityDescription;
+          this._cardEditComponent.querySelector(`.event__photos-tape`).innerHTML += pictureElement;
+        });
+        this._cardEditComponent.querySelector(`.event__destination-description`).textContent = cureentCityDescription;
+      }
     };
 
     /**
