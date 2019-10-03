@@ -66,6 +66,7 @@ class PointController {
    *    } } mode
    */
   init(mode) {
+    const oldData = this._data;
     let currentView = this._cardComponent;
     let renderPosition = Position.BEFOREEND;
 
@@ -145,6 +146,7 @@ class PointController {
       renderPosition = Position.AFTERBEGIN;
       this._onChangeView();
       currentView = this._cardEditComponent;
+      currentView.querySelector(`.event__rollup-btn`).style = `display: none`;
 
       currentView.querySelector(`.event__save-btn`).addEventListener(`click`, onFormSubmit);
       currentView.querySelector(`.event__input`).addEventListener(`change`, onCityInputChange);
@@ -284,8 +286,31 @@ class PointController {
       }
     };
 
+    const returnUnsavedData = () => {
+      this._cardEditComponent.querySelector(`.event__type-icon`).setAttribute(`src`, oldImageType);
+      this._cardEditComponent.querySelector(`.event__destination-description`).textContent = oldDescription;
+      this._cardEditComponent.querySelector(`.event__type-output`).textContent = oldTypeLabel;
+      this._cardEditComponent.querySelector(`.event__photos-tape`).innerHTML = oldData.photos.map((it, index)=> index < oldData.photos.length ? `<img class="event__photo" src="${it.src}" alt="${it.description}">` : ``).join(``);
+      this._cardEditComponent.querySelector(`.event__available-offers`).innerHTML = oldOffers.map((it, index) => index < oldOffers.length ? `
+          <div class="event__offer-selector">
+            <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offersData.find((offer) => offer.name === it.title).id}-${oldData.id}" type="checkbox" name="${offersData.find((offer) => offer.name === it.title).id}" ${it.isSelected ? `checked=""` : ``}>
+            <label class="event__offer-label" for="event-offer-${offersData.find((offer) => offer.name === it.title).id}-${oldData.id}">
+              <span class="event__offer-title">${it.title}</span>
+              +
+              €&nbsp;<span class="event__offer-price">${it.price}</span>
+            </label>
+          </div>
+          ` : ``).join(``);
+    };
+
+    let oldDescription = this._cardEditComponent.querySelector(`.event__destination-description`).textContent;
+    let oldImageType = this._cardEditComponent.querySelector(`.event__type-icon`).getAttribute(`src`);
+    let oldTypeLabel = this._cardEditComponent.querySelector(`.event__type-output`).textContent;
+    let oldOffers = this._data.offers;
+
     const onRollbackButtonClick = () => {
       this._cardEditComponent.querySelector(`.event--edit`).reset();
+      returnUnsavedData();
       this._cardEditComponent.parentNode.replaceChild(currentView, this._cardEditComponent);
       this._cardEditComponent.removeEventListener(`click`, onRollbackButtonClick);
       this._cardEditComponent.querySelector(`.event__input`).removeEventListener(`change`, onCityInputChange);
