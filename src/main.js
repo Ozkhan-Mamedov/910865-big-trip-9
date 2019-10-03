@@ -2,6 +2,7 @@ import {TripInfo} from './components/trip-info';
 import Menu from './components/menu';
 import Filters from './components/filters';
 import NoPoints from "./components/no-points";
+import LoadingScreen from "./components/loading-screen";
 import {menus, filters} from './data';
 import ModelPoint from "./model-point";
 import {renderComponent, unrenderComponent, Position, getDaysData} from "./utils";
@@ -133,6 +134,9 @@ const generatePageElements = () => {
   let tripController = null;
   let tripTypeOffers = null;
   let tripCityDescriptions = null;
+  const loadingScreen = new LoadingScreen().getElement();
+
+  renderComponent(mainContainer, loadingScreen, Position.AFTERBEGIN);
 
   api.getWaypoints({url: `offers`})
     .then((offers) => {
@@ -148,6 +152,7 @@ const generatePageElements = () => {
       tripDaysData = getDaysData(waypoints);
       renderComponent(tripInfoContainer, new TripInfo(waypoints).getElement(), Position.AFTERBEGIN);
       tripController = new TripController(mainContainer, waypoints, tripDaysData, tripCityDescriptions, tripTypeOffers, onDataChange);
+      unrenderComponent(loadingScreen);
       tripController.init();
       tripController._hideStatistics();
       checkTasksState();
