@@ -148,7 +148,7 @@ class PointController {
       currentView.querySelector(`.event__input`).addEventListener(`change`, onCityInputChange);
     }
     this._cardEditComponent.querySelector(`.event__type-toggle`).addEventListener(`click`, () => {
-      this._cardEditComponent.querySelector(`.event__type-list`).addEventListener(`click`, onListElementClick);
+      this._cardEditComponent.querySelector(`.event__type-list`).addEventListener(`click`, onTypeListClick);
     });
 
     const changeOffer = (offers) => {
@@ -189,70 +189,71 @@ class PointController {
     };
 
     /**
-     * @param {MouseEvent} clickEvt
+     * @param {MouseEvent} evt
      */
-    const onListElementClick = (clickEvt) => {
-      if (clickEvt.target.tagName === `INPUT`) {
-        this._cardEditComponent.querySelector(`.event__type-toggle`).checked = ``;
-        this._cardEditComponent.querySelector(`.event__type-list`).addEventListener(`click`, (evt) => {
-          if (evt.target.tagName === `INPUT`) {
-            let currentOffers;
+    const onListElementClick = (evt) => {
+      if (evt.target.tagName === `INPUT`) {
+        let currentOffers;
 
-            switch (evt.target.value) {
-              case `taxi`:
-                currentOffers = changeTypeData(`taxi`);
-                changeOffer(currentOffers);
-                break;
+        switch (evt.target.value) {
+          case `taxi`:
+            currentOffers = changeTypeData(`taxi`);
+            changeOffer(currentOffers);
+            break;
 
-              case `bus`:
-                currentOffers = changeTypeData(`bus`);
-                changeOffer(currentOffers);
-                break;
+          case `bus`:
+            currentOffers = changeTypeData(`bus`);
+            changeOffer(currentOffers);
+            break;
 
-              case `train`:
-                currentOffers = changeTypeData(`train`);
-                changeOffer(currentOffers);
-                break;
+          case `train`:
+            currentOffers = changeTypeData(`train`);
+            changeOffer(currentOffers);
+            break;
 
-              case `ship`:
-                currentOffers = changeTypeData(`ship`);
-                changeOffer(currentOffers);
-                break;
+          case `ship`:
+            currentOffers = changeTypeData(`ship`);
+            changeOffer(currentOffers);
+            break;
 
-              case `transport`:
-                currentOffers = changeTypeData(`transport`);
-                changeOffer(currentOffers);
-                break;
+          case `transport`:
+            currentOffers = changeTypeData(`transport`);
+            changeOffer(currentOffers);
+            break;
 
-              case `drive`:
-                currentOffers = changeTypeData(`drive`);
-                changeOffer(currentOffers);
-                break;
+          case `drive`:
+            currentOffers = changeTypeData(`drive`);
+            changeOffer(currentOffers);
+            break;
 
-              case `flight`:
-                currentOffers = changeTypeData(`flight`);
-                changeOffer(currentOffers);
-                break;
+          case `flight`:
+            currentOffers = changeTypeData(`flight`);
+            changeOffer(currentOffers);
+            break;
 
-              case `check-in`:
-                currentOffers = changeTypeData(`check-in`);
-                changeOffer(currentOffers);
-                break;
+          case `check-in`:
+            currentOffers = changeTypeData(`check-in`);
+            changeOffer(currentOffers);
+            break;
 
-              case `sightseeing`:
-                currentOffers = changeTypeData(`sightseeing`);
-                changeOffer(currentOffers);
-                break;
+          case `sightseeing`:
+            currentOffers = changeTypeData(`sightseeing`);
+            changeOffer(currentOffers);
+            break;
 
-              case `restaurant`:
-                currentOffers = changeTypeData(`restaurant`);
-                changeOffer(currentOffers);
-                break;
-            }
-          }
-        });
+          case `restaurant`:
+            currentOffers = changeTypeData(`restaurant`);
+            changeOffer(currentOffers);
+            break;
+        }
         this._cardEditComponent.querySelector(`.event__type-list`).removeEventListener(`click`, onListElementClick);
       }
+    };
+
+    const onTypeListClick = () => {
+      this._cardEditComponent.querySelector(`.event__type-toggle`).checked = ``;
+      this._cardEditComponent.querySelector(`.event__type-list`).addEventListener(`click`, onListElementClick);
+      this._cardEditComponent.querySelector(`.event__type-list`).removeEventListener(`click`, onTypeListClick);
     };
 
     const onDeleteButtonClick = () => {
@@ -295,7 +296,7 @@ class PointController {
       this._cardEditComponent.querySelector(`.event__reset-btn`).addEventListener(`click`, onDeleteButtonClick);
       this._cardEditComponent.querySelector(`.event__rollup-btn`).addEventListener(`click`, onRollbackButtonClick);
       currentView.removeEventListener(`click`, onRollupButtonClick);
-      this._cardEditComponent.querySelector(`.event__type-list`).addEventListener(`click`, onListElementClick);
+      this._cardEditComponent.querySelector(`.event__type-list`).addEventListener(`click`, onTypeListClick);
       this._cardEditComponent.querySelector(`.event__input`).addEventListener(`change`, onCityInputChange);
       this._cardEditComponent.querySelector(`.event__save-btn`).addEventListener(`click`, onFormSubmit);
       document.addEventListener(`keydown`, onEscKeyDown);
