@@ -46,7 +46,7 @@ class PointController {
     this._onDataChange = onDataChange;
     this._onChangeView = onChangeView;
     this._cardComponent = new Card(data).getElement();
-    this._cardEditComponent = new CardEdit(data, cityDescriptionData, tripTypeOffers).getElement();
+    this._cardEditComponent = new CardEdit(data, cityDescriptionData).getElement();
     this._cityDescriptionData = cityDescriptionData;
     this._tripTypeOffers = tripTypeOffers;
 
@@ -141,6 +141,7 @@ class PointController {
 
     if (mode === TripControllerMode.ADDING) {
       renderPosition = Position.AFTERBEGIN;
+      this._onChangeView();
       currentView = this._cardEditComponent;
 
       currentView.querySelector(`.event__save-btn`).addEventListener(`click`, onFormSubmit);
