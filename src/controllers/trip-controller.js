@@ -64,6 +64,9 @@ class TripController {
     this._tripTypeOffers = tripTypeOffers;
     this._creatingWaypoint = null;
     this._noPointsElement = null;
+    this._transportChart = null;
+    this._moneyChart = null;
+    this._timeChart = null;
     this._onDataChange = this._onDataChange.bind(this);
     this._onChangeView = this._onChangeView.bind(this);
   }
@@ -288,19 +291,18 @@ class TripController {
     }
   }
 
-  _showStatistics() {
+  _showStatistics(waypoints) {
     Chart.defaults.global.defaultFontColor = `#000000`;
     Chart.defaults.global.defaultFontSize = 14;
     const moneyCtx = this._container.querySelector(`.statistics__chart--money`);
     const transportCtx = this._container.querySelector(`.statistics__chart--transport`);
     const timeCtx = this._container.querySelector(`.statistics__chart--time`);
-    // eslint-disable-next-line no-unused-vars
-    const moneyChart = new Chart(moneyCtx, {
+    this._moneyChart = new Chart(moneyCtx, {
       type: `horizontalBar`,
       plugins: [ChartDataLabels],
       data: {
         labels: waypointTypeNames.filter((name) => {
-          return this._waypoints.some((it) => {
+          return waypoints.some((it) => {
             return it.type === waypointType[name];
           });
         }).map((filteredName) => filteredName.toUpperCase()),
@@ -308,7 +310,7 @@ class TripController {
           data: waypointTypeNames.map((name) => {
             let sum = 0;
 
-            this._waypoints.forEach((it) => {
+            waypoints.forEach((it) => {
               if (it.type === waypointType[name]) {
                 sum += it.waypointPrice;
               }
@@ -370,13 +372,12 @@ class TripController {
         }
       },
     });
-    // eslint-disable-next-line no-unused-vars
-    const transportChart = new Chart(transportCtx, {
+    this._transportChart = new Chart(transportCtx, {
       type: `horizontalBar`,
       plugins: [ChartDataLabels],
       data: {
         labels: waypointTransportTypeNames.filter((name) => {
-          return this._waypoints.some((it) => {
+          return waypoints.some((it) => {
             return it.type === waypointType[name];
           });
         }).map((filteredName) => filteredName.toUpperCase()),
@@ -384,7 +385,7 @@ class TripController {
           data: waypointTypeNames.map((name) => {
             let sum = 0;
 
-            this._waypoints.forEach((it) => {
+            waypoints.forEach((it) => {
               if (it.type === waypointType[name]) {
                 sum++;
               }
@@ -446,11 +447,10 @@ class TripController {
         }
       },
     });
-    const destinations = [...new Set(this._waypoints.map((it) => {
+    const destinations = [...new Set(waypoints.map((it) => {
       return it.city;
     }))];
-    // eslint-disable-next-line no-unused-vars
-    const timeChart = new Chart(timeCtx, {
+    this._timeChart = new Chart(timeCtx, {
       type: `horizontalBar`,
       plugins: [ChartDataLabels],
       data: {
@@ -459,7 +459,7 @@ class TripController {
           data: destinations.map((name, index) => {
             let sum = 0;
 
-            this._waypoints.forEach((it) => {
+            waypoints.forEach((it) => {
               if (it.city === destinations[index]) {
                 sum += it.time.endTime - it.time.startTime;
               }
@@ -470,7 +470,7 @@ class TripController {
           data1: waypointTypeNames.map((name) => {
             let sum = 0;
 
-            this._waypoints.forEach((it) => {
+            waypoints.forEach((it) => {
               if (it.type === waypointType[name]) {
                 sum += it.time.endTime - it.time.startTime;
               }
@@ -542,6 +542,11 @@ class TripController {
     this._container.querySelector(`.statistics`).classList.add(`visually-hidden`);
     this._board.getElement().classList.remove(`visually-hidden`);
     this._sort.getElement().classList.remove(`visually-hidden`);
+    if (this._transportChart !== null) {
+      this._transportChart.destroy();
+      this._moneyChart.destroy();
+      this._timeChart.destroy();
+    }
   }
 }
 

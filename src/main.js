@@ -192,7 +192,7 @@ const generatePageElements = () => {
           case `Stats`:
             evt.currentTarget.children[0].classList.remove(`trip-tabs__btn--active`);
             evt.target.classList.add(`trip-tabs__btn--active`);
-            tripController._showStatistics();
+            tripController._showStatistics(waypoints);
             break;
         }
       });
