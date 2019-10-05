@@ -1,12 +1,14 @@
-import {getRandomNumber, Position, renderComponent, unrenderComponent, getDaysData} from "../utils";
+import {getRandomNumber, Position, renderComponent, unrenderComponent, getDaysData, block} from "../utils";
 import {getSortedByDateList} from "../data";
 import CardBoard from "../components/card-board";
 import Day from "../components/day-container";
 import Sort from "../components/sort";
 import PointController from "./point-controller";
 import Statistics from "../components/statistics";
-import {cities, TripControllerMode, waypointType, waypointTypeNames,
-  MSECONDS_IN_SECOND, SECONDS_IN_MINUTE, MINUTES_IN_HOUR, waypointTransportTypeNames} from "../constants";
+import {
+  cities, TripControllerMode, waypointType, waypointTypeNames,
+  MSECONDS_IN_SECOND, SECONDS_IN_MINUTE, MINUTES_IN_HOUR, waypointTransportTypeNames
+} from "../constants";
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import TripInfoController from "./trip-info-controller";
@@ -176,39 +178,52 @@ class TripController {
    */
   _onDataChange(newData, oldData) {
     if (oldData !== null && newData !== null) {
-      this._waypoints[this._waypoints.findIndex((it) => it === oldData)] = newData;
-      this._onDataChangeMain(`update`, this._waypoints[this._waypoints.findIndex((it) => it === newData)]);
+      block(`Save`);
+      setTimeout(() => {
+        this._waypoints[this._waypoints.findIndex((it) => it === oldData)] = newData;
+        this._onDataChangeMain(`update`, this._waypoints[this._waypoints.findIndex((it) => it === newData)]);
+      }, 1000);
     }
     if (newData === null) {
-      this._onDataChangeMain(`delete`, this._waypoints[this._waypoints.findIndex((it) => it === oldData)]);
-      this._waypoints.splice(this._waypoints.findIndex((it) => it === oldData), 1);
-      this._tripDaysData = getDaysData(this._waypoints);
-      if (this._waypoints.length === 0) {
-        this._noPointsElement = new NoPoints().getElement();
-        renderComponent(this._container, this._noPointsElement, Position.BEFOREEND);
-        unrenderComponent(this._sort.getElement());
-      }
+      block(`Delete`);
+      setTimeout(() => {
+        this._onDataChangeMain(`delete`, this._waypoints[this._waypoints.findIndex((it) => it === oldData)]);
+        this._waypoints.splice(this._waypoints.findIndex((it) => it === oldData), 1);
+        this._tripDaysData = getDaysData(this._waypoints);
+        if (this._waypoints.length === 0) {
+          this._noPointsElement = new NoPoints().getElement();
+          renderComponent(this._container, this._noPointsElement, Position.BEFOREEND);
+          unrenderComponent(this._sort.getElement());
+        }
+      }, 1000);
     }
     if (oldData === null) {
-      this._onDataChangeMain(`create`, newData);
-      this._waypoints.unshift(newData);
-      this._waypoints.sort(getSortedByDateList);
-      this._tripDaysData = getDaysData(this._waypoints);
-      this._creatingWaypoint = null;
+      setTimeout(() => {
+        this._onDataChangeMain(`create`, newData);
+        this._waypoints.unshift(newData);
+        this._waypoints.sort(getSortedByDateList);
+        this._tripDaysData = getDaysData(this._waypoints);
+        this._creatingWaypoint = null;
+        if (this._container.querySelector(`.trip-days`).children[1].children.length === 0) {
+          renderComponent(this._container, this._sort.getElement(), Position.AFTERBEGIN);
+        }
+      }, 1000);
     }
-    unrenderComponent(this._board.getElement());
-    this._board = new CardBoard();
-    renderComponent(this._container, this._board.getElement(), Position.BEFOREEND);
-    this._dayElement = new Day(this._tripDaysData).getElement();
-    renderComponent(this._board.getElement().firstElementChild, this._dayElement, Position.BEFOREEND);
-    this._eventContainerIndex = 0;
-    this._waypoints.forEach((it, dayIndex) => {
-      if ((dayIndex > 0) && (this._tripDaysData[dayIndex].tripDay !== this._tripDaysData[dayIndex - 1].tripDay)) {
-        this._eventContainerIndex++;
-      }
-      this._renderTripWaypoint(it, this._eventContainerIndex);
-    });
-    this._tripInfoController.updateTripInfo(this._waypoints);
+    setTimeout(() => {
+      unrenderComponent(this._board.getElement());
+      this._board = new CardBoard();
+      renderComponent(this._container, this._board.getElement(), Position.BEFOREEND);
+      this._dayElement = new Day(this._tripDaysData).getElement();
+      renderComponent(this._board.getElement().firstElementChild, this._dayElement, Position.BEFOREEND);
+      this._eventContainerIndex = 0;
+      this._waypoints.forEach((it, dayIndex) => {
+        if ((dayIndex > 0) && (this._tripDaysData[dayIndex].tripDay !== this._tripDaysData[dayIndex - 1].tripDay)) {
+          this._eventContainerIndex++;
+        }
+        this._renderTripWaypoint(it, this._eventContainerIndex);
+      });
+      this._tripInfoController.updateTripInfo(this._waypoints);
+    }, 1000);
   }
 
   _onChangeView() {
@@ -279,6 +294,7 @@ class TripController {
     const moneyCtx = this._container.querySelector(`.statistics__chart--money`);
     const transportCtx = this._container.querySelector(`.statistics__chart--transport`);
     const timeCtx = this._container.querySelector(`.statistics__chart--time`);
+    // eslint-disable-next-line no-unused-vars
     const moneyChart = new Chart(moneyCtx, {
       type: `horizontalBar`,
       plugins: [ChartDataLabels],
@@ -354,6 +370,7 @@ class TripController {
         }
       },
     });
+    // eslint-disable-next-line no-unused-vars
     const transportChart = new Chart(transportCtx, {
       type: `horizontalBar`,
       plugins: [ChartDataLabels],
@@ -432,6 +449,7 @@ class TripController {
     const destinations = [...new Set(this._waypoints.map((it) => {
       return it.city;
     }))];
+    // eslint-disable-next-line no-unused-vars
     const timeChart = new Chart(timeCtx, {
       type: `horizontalBar`,
       plugins: [ChartDataLabels],

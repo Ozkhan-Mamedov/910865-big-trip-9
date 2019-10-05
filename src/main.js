@@ -5,7 +5,7 @@ import NoPoints from "./components/no-points";
 import LoadingScreen from "./components/loading-screen";
 import {menus, filters} from './data';
 import ModelPoint from "./model-point";
-import {renderComponent, unrenderComponent, Position, getDaysData} from "./utils";
+import {renderComponent, unrenderComponent, Position, getDaysData, addShacking} from "./utils";
 import TripController from "./controllers/trip-controller";
 import API from "./api";
 
@@ -23,7 +23,7 @@ const onDataChange = (actionType, update) => {
       api.deleteWaypoint({
         id: update.id
       })
-        .then(() => api.getWaypoints({url: `points`}))
+        .then(() => api.getWaypoints({url: `points`}), addShacking)
         .then((waypointData) => {
           waypoints = ModelPoint.parseWaypoints(waypointData);
         });

@@ -1,6 +1,6 @@
 import Card from "../components/card";
 import CardEdit from "../components/card-edit";
-import {renderComponent, Position} from "../utils";
+import {renderComponent, Position, block} from "../utils";
 import {offersData} from "../constants";
 import {waypointType, TripControllerMode} from "../constants";
 import moment from 'moment';
@@ -136,10 +136,13 @@ class PointController {
         }),
       };
 
-      this._onDataChange(entry, mode === TripControllerMode.ADDING ? null : this._data);
-      onRollbackButtonClick();
-      this._cardEditComponent.querySelector(`.event--edit`).removeEventListener(`click`, onFormSubmit);
-      document.removeEventListener(`keydown`, onEscKeyDown);
+      block(`Save`);
+      setTimeout(() => {
+        this._onDataChange(entry, mode === TripControllerMode.ADDING ? null : this._data);
+        onRollbackButtonClick();
+        this._cardEditComponent.querySelector(`.event--edit`).removeEventListener(`click`, onFormSubmit);
+        document.removeEventListener(`keydown`, onEscKeyDown);
+      }, 1000);
     };
 
     if (mode === TripControllerMode.ADDING) {
@@ -299,6 +302,9 @@ class PointController {
             </label>
           </div>
           ` : ``).join(``);
+      if (oldOffers.length === 0) {
+        this._cardEditComponent.querySelector(`.event__section--offers`).classList.add(`visually-hidden`);
+      }
     };
 
     let oldDescription = this._cardEditComponent.querySelector(`.event__destination-description`).textContent;
