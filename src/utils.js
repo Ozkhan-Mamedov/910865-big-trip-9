@@ -105,11 +105,45 @@ const getDaysData = (waypoints) => {
   return dates;
 };
 
+const block = (btn) => {
+  switch (btn) {
+    case `Save`:
+      document.querySelector(`.event__save-btn`).textContent = `Saving...`;
+      break;
+
+    case `Delete`:
+      document.querySelector(`.event__reset-btn`).textContent = `Deleting...`;
+      break;
+  }
+  document.querySelector(`.event__save-btn`).disabled = true;
+  document.querySelector(`.event__reset-btn`).disabled = true;
+  document.querySelector(`.event__rollup-btn`).disabled = true;
+  document.querySelectorAll(`.event__offer-checkbox`).forEach((it) => {
+    it.setAttribute(`disabled`, ``);
+  });
+  document.querySelector(`.event__input--destination`).setAttribute(`disabled`, ``);
+  document.querySelectorAll(`.event__input--time`).forEach((it) => {
+    it.setAttribute(`disabled`, ``);
+  });
+  document.querySelector(`.event__input--price`).setAttribute(`disabled`, ``);
+  document.querySelector(`.event__type-toggle`).setAttribute(`disabled`, ``);
+  document.querySelector(`.event__favorite-checkbox`).setAttribute(`disabled`, ``);
+};
+
+const addShacking = () => {
+  document.querySelector(`.event--edit`).classList.add(`shake`);
+  setTimeout(() => {
+    document.querySelector(`.event--edit`).classList.remove(`shake`);
+  }, 1000);
+};
+
 export {
   Position,
   getRandomNumber,
   createElement,
   renderComponent,
   unrenderComponent,
-  getDaysData
+  getDaysData,
+  block,
+  addShacking
 };

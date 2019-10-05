@@ -1,5 +1,6 @@
 import AbstractComponent from "./abstract-components";
 import moment from 'moment';
+import {MAX_OFFER_NUMBER} from "../constants";
 
 class Card extends AbstractComponent {
   /**
@@ -79,7 +80,7 @@ class Card extends AbstractComponent {
               +
               €&nbsp;<span class="event__offer-price">${it.price}</span>
             </li>
-           ` : ``).join(``)}
+           ` : ``).slice(0, MAX_OFFER_NUMBER).join(``)}
           </ul>
     
           <button class="event__rollup-btn" type="button">

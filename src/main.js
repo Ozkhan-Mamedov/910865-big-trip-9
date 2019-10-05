@@ -2,9 +2,10 @@ import {TripInfo} from './components/trip-info';
 import Menu from './components/menu';
 import Filters from './components/filters';
 import NoPoints from "./components/no-points";
+import LoadingScreen from "./components/loading-screen";
 import {menus, filters} from './data';
 import ModelPoint from "./model-point";
-import {renderComponent, unrenderComponent, Position, getDaysData} from "./utils";
+import {renderComponent, unrenderComponent, Position, getDaysData, addShacking} from "./utils";
 import TripController from "./controllers/trip-controller";
 import API from "./api";
 
@@ -17,13 +18,12 @@ const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
 let waypoints = null;
 
 const onDataChange = (actionType, update) => {
-  console.log(update);
   switch (actionType) {
     case `delete`:
       api.deleteWaypoint({
         id: update.id
       })
-        .then(() => api.getWaypoints({url: `points`}))
+        .then(() => api.getWaypoints({url: `points`}), addShacking)
         .then((waypointData) => {
           waypoints = ModelPoint.parseWaypoints(waypointData);
         });
@@ -34,7 +34,7 @@ const onDataChange = (actionType, update) => {
         id: update.id,
         data: toRAW(update)
       })
-        .then(() => api.getWaypoints({url: `points`}))
+        .then(() => api.getWaypoints({url: `points`}), addShacking)
         .then((waypointData) => {
           waypoints = ModelPoint.parseWaypoints(waypointData);
         });
@@ -44,7 +44,7 @@ const onDataChange = (actionType, update) => {
       api.createWaypoint({
         waypoint: toRAW(update)
       })
-        .then(() => api.getWaypoints({url: `points`}))
+        .then(() => api.getWaypoints({url: `points`}), addShacking)
         .then((waypointData) => {
           waypoints = ModelPoint.parseWaypoints(waypointData);
         });
@@ -127,7 +127,6 @@ const generatePageElements = () => {
     }
   };
 
-  //renderComponent(tripInfoContainer, new TripInfo(sortedWaypoints).getElement(), Position.AFTERBEGIN); // in
   renderComponent(controlsContainer, new Menu(menus).getElement(), Position.BEFOREEND);
   renderComponent(controlsContainer, new Filters(filters).getElement(), Position.BEFOREEND);
 
@@ -135,6 +134,9 @@ const generatePageElements = () => {
   let tripController = null;
   let tripTypeOffers = null;
   let tripCityDescriptions = null;
+  const loadingScreen = new LoadingScreen().getElement();
+
+  renderComponent(mainContainer, loadingScreen, Position.AFTERBEGIN);
 
   api.getWaypoints({url: `offers`})
     .then((offers) => {
@@ -146,13 +148,12 @@ const generatePageElements = () => {
     })
     .then(() => api.getWaypoints({url: `points`}))
     .then((waypointData) => {
-      //waypoints = waypointData.slice().map((it) => new ModelPoint(it));
       waypoints = ModelPoint.parseWaypoints(waypointData);
       tripDaysData = getDaysData(waypoints);
       renderComponent(tripInfoContainer, new TripInfo(waypoints).getElement(), Position.AFTERBEGIN);
       tripController = new TripController(mainContainer, waypoints, tripDaysData, tripCityDescriptions, tripTypeOffers, onDataChange);
+      unrenderComponent(loadingScreen);
       tripController.init();
-      //tripCostValue.textContent = `${getTripCostValue(waypoints)}`;
       tripController._hideStatistics();
       checkTasksState();
       controlsContainer.querySelector(`.trip-filters`).addEventListener(`click`, (evt) => {
@@ -198,56 +199,6 @@ const generatePageElements = () => {
 
       document.querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, onAddButtonClick);
     });
-  /*
-  let tripDaysData = getDaysData(sortedWaypoints);
-  let tripController = new TripController(mainContainer, sortedWaypoints, tripDaysData);
-
-  tripController.init();
-  //tripCostValue.textContent = `${getTripCostValue(sortedWaypoints)}`;
-  tripController._hideStatistics();
-  checkTasksState();
-  controlsContainer.querySelector(`.trip-filters`).addEventListener(`click`, (evt) => {
-    switch (evt.target.value) {
-      case `everything`:
-        presetFilteredPage(sortedWaypoints);
-        break;
-
-      case `future`:
-        const futureWaypoints = sortedWaypoints.filter((it) => it.time.startTime > Date.now());
-
-        presetFilteredPage(futureWaypoints);
-        break;
-
-      case `past`:
-        const pastWaypoints = sortedWaypoints.filter((it) => it.time.startTime < Date.now());
-
-        presetFilteredPage(pastWaypoints);
-        break;
-    }
-  });
-  controlsContainer.querySelector(`.trip-tabs`).addEventListener(`click`, (evt) => {
-    evt.preventDefault();
-
-    if (evt.target.tagName !== `A`) {
-      return;
-    }
-
-    switch (evt.target.text) {
-      case `Table`:
-        evt.currentTarget.children[1].classList.remove(`trip-tabs__btn--active`);
-        evt.target.classList.add(`trip-tabs__btn--active`);
-        tripController._hideStatistics();
-        break;
-
-      case `Stats`:
-        evt.currentTarget.children[0].classList.remove(`trip-tabs__btn--active`);
-        evt.target.classList.add(`trip-tabs__btn--active`);
-        tripController._showStatistics();
-        break;
-    }
-  });
-
-  document.querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, onAddButtonClick);*/
 };
 
 generatePageElements();
