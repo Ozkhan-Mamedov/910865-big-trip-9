@@ -34,7 +34,7 @@ const onDataChange = (actionType, update) => {
         id: update.id,
         data: toRAW(update)
       })
-        .then(() => api.getWaypoints({url: `points`}))
+        .then(() => api.getWaypoints({url: `points`}), addShacking)
         .then((waypointData) => {
           waypoints = ModelPoint.parseWaypoints(waypointData);
         });
@@ -44,7 +44,7 @@ const onDataChange = (actionType, update) => {
       api.createWaypoint({
         waypoint: toRAW(update)
       })
-        .then(() => api.getWaypoints({url: `points`}))
+        .then(() => api.getWaypoints({url: `points`}), addShacking)
         .then((waypointData) => {
           waypoints = ModelPoint.parseWaypoints(waypointData);
         });

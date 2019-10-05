@@ -132,6 +132,9 @@ const block = (btn) => {
 
 const addShacking = () => {
   document.querySelector(`.event--edit`).classList.add(`shake`);
+  setTimeout(() => {
+    document.querySelector(`.event--edit`).classList.remove(`shake`);
+  }, 1000);
 };
 
 export {

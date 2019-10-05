@@ -1,6 +1,6 @@
 import Card from "../components/card";
 import CardEdit from "../components/card-edit";
-import {renderComponent, Position, block} from "../utils";
+import {renderComponent, Position, block, addShacking} from "../utils";
 import {offersData} from "../constants";
 import {waypointType, TripControllerMode} from "../constants";
 import moment from 'moment';
@@ -136,6 +136,11 @@ class PointController {
         }),
       };
 
+      if (entry.city === `` || this._cityDescriptionData.map((it) => {
+        return it.name;
+      }).indexOf(entry.city) === -1 || entry.waypointPrice < 0) {
+        throw addShacking();
+      }
       block(`Save`);
       setTimeout(() => {
         this._onDataChange(entry, mode === TripControllerMode.ADDING ? null : this._data);
@@ -270,7 +275,7 @@ class PointController {
     flatpickr(this._cardEditComponent
         .querySelectorAll(`.event__input--time`),
     {
-      dateFormat: `d/m/y H:i`,
+      dateFormat: `d.m.y H:i`,
       enableTime: true,
       [`time_24hr`]: true,
     }

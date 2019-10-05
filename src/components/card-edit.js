@@ -133,12 +133,12 @@ class CardEdit extends AbstractComponent {
             <label class="visually-hidden" for="event-start-time-${this._id}">
               From
             </label>
-            <input class="event__input  event__input--time" id="event-start-time-${this._id}" type="text" name="event-start-time" value="${moment(this._time.startTime).format(`DD/MM/YY HH:mm`)}">
+            <input class="event__input  event__input--time" id="event-start-time-${this._id}" type="text" name="event-start-time" value="${moment(this._time.startTime).format(`DD.MM.YY HH:mm`)}">
             —
             <label class="visually-hidden" for="event-end-time-${this._id}">
               To
             </label>
-            <input class="event__input  event__input--time" id="event-end-time-${this._id}" type="text" name="event-end-time" value="${moment(this._time.endTime).format(`DD/MM/YY HH:mm`)}">
+            <input class="event__input  event__input--time" id="event-end-time-${this._id}" type="text" name="event-end-time" value="${moment(this._time.endTime).format(`DD.MM.YY HH:mm`)}">
           </div>
   
           <div class="event__field-group  event__field-group--price">
@@ -146,7 +146,7 @@ class CardEdit extends AbstractComponent {
               <span class="visually-hidden">Price</span>
               €
             </label>
-            <input class="event__input  event__input--price" id="event-price-${this._id}" type="text" name="event-price" value="${this._waypointPrice}">
+            <input class="event__input  event__input--price" id="event-price-${this._id}" type="number" min="0" name="event-price" value="${this._waypointPrice}">
           </div>
   
           <button class="event__save-btn  btn  btn--blue" type="button">Save</button>
