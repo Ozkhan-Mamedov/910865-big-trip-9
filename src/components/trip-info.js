@@ -11,8 +11,8 @@ class TripInfo extends AbstractComponent {
    * @return {string}
    */
   getTemplate() {
-    let routePoints = new Set();
-    let routeDates = {};
+    const routePoints = new Set();
+    const routeDates = {};
 
     if (this._waypoints.length) {
       this._waypoints.forEach((it) => {

@@ -96,7 +96,7 @@ class PointController {
       const formData = new FormData(this._cardEditComponent.querySelector(`.event--edit`));
       const pathDirectories = this._cardEditComponent.querySelector(`.event__type-icon`).src.split(`/`);
       const imageName = pathDirectories[pathDirectories.length - 1];
-      let entry = {
+      const entry = {
         type: {
           address: imageName,
           template: this._cardEditComponent.querySelector(`.event__type-output`).outerText
@@ -312,10 +312,10 @@ class PointController {
       }
     };
 
-    let oldDescription = this._cardEditComponent.querySelector(`.event__destination-description`).textContent;
-    let oldImageType = this._cardEditComponent.querySelector(`.event__type-icon`).getAttribute(`src`);
-    let oldTypeLabel = this._cardEditComponent.querySelector(`.event__type-output`).textContent;
-    let oldOffers = this._data.offers;
+    const oldDescription = this._cardEditComponent.querySelector(`.event__destination-description`).textContent;
+    const oldImageType = this._cardEditComponent.querySelector(`.event__type-icon`).getAttribute(`src`);
+    const oldTypeLabel = this._cardEditComponent.querySelector(`.event__type-output`).textContent;
+    const oldOffers = this._data.offers;
 
     const onRollbackButtonClick = () => {
       this._cardEditComponent.querySelector(`.event--edit`).reset();

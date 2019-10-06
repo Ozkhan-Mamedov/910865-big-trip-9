@@ -42,11 +42,11 @@ const getWaypointPrice = () => {
  *                isSelected : boolean }>}
  */
 const getOffers = () => {
-  let offers = new Set();
-  let elemIndex = getRandomNumber(0, MAX_OFFERS_RANGE);
+  const offers = new Set();
+  const elemIndex = getRandomNumber(0, MAX_OFFERS_RANGE);
 
   for (let i = 0; i < elemIndex; i++) {
-    let elem = additionalOffers[getRandomNumber(0, additionalOffers.length - 1)];
+    const elem = additionalOffers[getRandomNumber(0, additionalOffers.length - 1)];
 
     if (elem.isSelected === true) {
       offers.add(elem);
@@ -60,7 +60,7 @@ const getOffers = () => {
  * @return { [string] }
  */
 const getWaypointPhotos = () => {
-  let photos = [];
+  const photos = [];
   const photosNumber = getRandomNumber(0, MAX_PHOTOS_NUMBER);
 
   for (let i = 0; i < photosNumber; i++) {
