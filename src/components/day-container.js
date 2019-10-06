@@ -35,7 +35,7 @@ const getDayNumber = (tripDays) => {
  * @return {number[]}
  */
 const getUniqueTripDays = (tripDays) => {
-  let uniqueTripDays = new Set();
+  const uniqueTripDays = new Set();
 
   tripDays.forEach((it) => {
     uniqueTripDays.add(it.tripDay);

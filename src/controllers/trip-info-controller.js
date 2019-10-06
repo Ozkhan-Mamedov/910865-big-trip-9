@@ -10,8 +10,8 @@ class TripInfoController {
     const tripCostValue = document.querySelector(`.trip-info__cost-value`);
     const tripTitle = document.querySelector(`.trip-info__title`);
     const tripDates = document.querySelector(`.trip-info__dates`);
-    let routePoints = new Set();
-    let routeDates = {};
+    const routePoints = new Set();
+    const routeDates = {};
 
     if (this._waypoints.length) {
       this._waypoints.forEach((it) => {

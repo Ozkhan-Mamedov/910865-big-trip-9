@@ -7,6 +7,7 @@ import moment from 'moment';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import 'flatpickr/dist/themes/light.css';
+import DOMPurify from 'dompurify';
 
 
 class PointController {
@@ -81,7 +82,7 @@ class PointController {
         currentCityPictures.forEach((it) => {
           const pictureElement = `<img class="event__photo" src="${it.src}" alt="${it.description}">`;
 
-          this._cardEditComponent.querySelector(`.event__photos-tape`).innerHTML += pictureElement;
+          this._cardEditComponent.querySelector(`.event__photos-tape`).innerHTML += DOMPurify.sanitize(pictureElement);
         });
         this._cardEditComponent.querySelector(`.event__destination-description`).textContent = cureentCityDescription;
       }
@@ -96,7 +97,7 @@ class PointController {
       const formData = new FormData(this._cardEditComponent.querySelector(`.event--edit`));
       const pathDirectories = this._cardEditComponent.querySelector(`.event__type-icon`).src.split(`/`);
       const imageName = pathDirectories[pathDirectories.length - 1];
-      let entry = {
+      const entry = {
         type: {
           address: imageName,
           template: this._cardEditComponent.querySelector(`.event__type-output`).outerText
@@ -181,7 +182,7 @@ class PointController {
             </div>
           `;
 
-          this._cardEditComponent.querySelector(`.event__available-offers`).innerHTML += offerElement;
+          this._cardEditComponent.querySelector(`.event__available-offers`).innerHTML += DOMPurify.sanitize(offerElement);
         });
       } else {
         this._cardEditComponent.querySelector(`.event__section--offers`).classList.add(`visually-hidden`);
@@ -296,8 +297,8 @@ class PointController {
       this._cardEditComponent.querySelector(`.event__type-icon`).setAttribute(`src`, oldImageType);
       this._cardEditComponent.querySelector(`.event__destination-description`).textContent = oldDescription;
       this._cardEditComponent.querySelector(`.event__type-output`).textContent = oldTypeLabel;
-      this._cardEditComponent.querySelector(`.event__photos-tape`).innerHTML = oldData.photos.map((it, index)=> index < oldData.photos.length ? `<img class="event__photo" src="${it.src}" alt="${it.description}">` : ``).join(``);
-      this._cardEditComponent.querySelector(`.event__available-offers`).innerHTML = oldOffers.map((it, index) => index < oldOffers.length ? `
+      this._cardEditComponent.querySelector(`.event__photos-tape`).innerHTML = DOMPurify.sanitize(oldData.photos.map((it, index)=> index < oldData.photos.length ? `<img class="event__photo" src="${it.src}" alt="${it.description}">` : ``).join(``));
+      this._cardEditComponent.querySelector(`.event__available-offers`).innerHTML = DOMPurify.sanitize(oldOffers.map((it, index) => index < oldOffers.length ? `
           <div class="event__offer-selector">
             <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offersData.find((offer) => offer.name === it.title).id}-${oldData.id}" type="checkbox" name="${offersData.find((offer) => offer.name === it.title).id}" ${it.isSelected ? `checked=""` : ``}>
             <label class="event__offer-label" for="event-offer-${offersData.find((offer) => offer.name === it.title).id}-${oldData.id}">
@@ -306,16 +307,16 @@ class PointController {
               €&nbsp;<span class="event__offer-price">${it.price}</span>
             </label>
           </div>
-          ` : ``).join(``);
+          ` : ``).join(``));
       if (oldOffers.length === 0) {
         this._cardEditComponent.querySelector(`.event__section--offers`).classList.add(`visually-hidden`);
       }
     };
 
-    let oldDescription = this._cardEditComponent.querySelector(`.event__destination-description`).textContent;
-    let oldImageType = this._cardEditComponent.querySelector(`.event__type-icon`).getAttribute(`src`);
-    let oldTypeLabel = this._cardEditComponent.querySelector(`.event__type-output`).textContent;
-    let oldOffers = this._data.offers;
+    const oldDescription = this._cardEditComponent.querySelector(`.event__destination-description`).textContent;
+    const oldImageType = this._cardEditComponent.querySelector(`.event__type-icon`).getAttribute(`src`);
+    const oldTypeLabel = this._cardEditComponent.querySelector(`.event__type-output`).textContent;
+    const oldOffers = this._data.offers;
 
     const onRollbackButtonClick = () => {
       this._cardEditComponent.querySelector(`.event--edit`).reset();

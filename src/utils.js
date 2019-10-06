@@ -79,7 +79,7 @@ const unrenderComponent = (element) => {
  *        } ] }
  */
 const getDaysData = (waypoints) => {
-  let dates = [];
+  const dates = [];
 
   if (waypoints.length) {
     let currentTripDay = 1;
